@@ -1,31 +1,24 @@
-package com.marrocumarcodeveloper.set_point.presentation
+package com.marrocumarcodeveloper.set_point.business_logic
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.marrocumarcodeveloper.set_point.business_logic.EndedSet
-import com.marrocumarcodeveloper.set_point.business_logic.Player
-import com.marrocumarcodeveloper.set_point.business_logic.Point
+class MatchImpl: Match {
 
-class Match(player1Name: String, player2Name: String, application: Application) :
-    AndroidViewModel(application) {
+    val player1 = Player("P1")
+    val player2 = Player("P2")
 
-    val player1 = Player(player1Name)
-    val player2 = Player(player2Name)
+    override var player1Serves = true
+    override var endedSets = ArrayList<EndedSet>()
+    override var showCurrentSetScore = true
+    override var showEndedMatchAlert = false
+    override var pointButtonsDisabled = false
+    override var player1GameScoreDescription = Point.ZERO.name
+    override var player2GameScoreDescription = Point.ZERO.name
 
-    var player1Serves = true
-    var endedSets = ArrayList<EndedSet>()
-    var player1GameScoreDescription = Point.ZERO.name
-    var player2GameScoreDescription = Point.ZERO.name
-    var isTiebreak = false
-    var showCurrentSetScore = true
-    var showEndedMatchAlert = false
-    var pointButtonsDisabled = false
+    private var isTiebreak = false
+    private var winner: Player? = null
+    private var isTiebreakEnabled = true
+    private var numberOfSetsNeededToWin = 3
 
-    var winner: Player? = null
-    var isTiebreakEnabled = true
-    var numberOfSetsNeededToWin = 3
-
-    fun pointWonBy(player: Player) {
+    private fun pointWonBy(player: Player) {
         val opponent = if (player === player1) player2 else player1
         if (isTiebreakEnabled && isTiebreak) {
             player.points += 1
@@ -45,7 +38,7 @@ class Match(player1Name: String, player2Name: String, application: Application) 
         calculatePointDescription(opponent)
     }
 
-    fun checkGameWin(player: Player) {
+    private fun checkGameWin(player: Player) {
         val opponent = if (player === player1) player2 else player1
         if (player.points >= 4 && player.points >= opponent.points + 2) {
             player.games += 1
@@ -58,7 +51,7 @@ class Match(player1Name: String, player2Name: String, application: Application) 
         }
     }
 
-    fun checkSetWin(player: Player) {
+    private fun checkSetWin(player: Player) {
         val opponent = if (player === player1) player2 else player1
         var setWin = false
         if (isTiebreakEnabled && isTiebreak) {
@@ -92,7 +85,7 @@ class Match(player1Name: String, player2Name: String, application: Application) 
         }
     }
 
-    fun checkMatchWin(player: Player) {
+    private fun checkMatchWin(player: Player) {
         if (player.sets == numberOfSetsNeededToWin) {
             winner = player
             showCurrentSetScore = false
@@ -101,7 +94,7 @@ class Match(player1Name: String, player2Name: String, application: Application) 
         }
     }
 
-    fun resetMatch() {
+    override suspend fun resetMatch() {
         player1.resetPoints()
         player1.resetGames()
         player1.resetSets()
@@ -118,7 +111,15 @@ class Match(player1Name: String, player2Name: String, application: Application) 
         calculatePointDescription(player2)
     }
 
-    fun calculatePointDescription(player: Player) {
+    override suspend fun pointWonByPlayerOne() {
+        pointWonBy(player1)
+    }
+
+    override suspend fun pointWonByPlayerTwo() {
+        pointWonBy(player2)
+    }
+
+    private fun calculatePointDescription(player: Player) {
         var pointsDescription = ""
         if (isTiebreak) {
             pointsDescription = player.points.toString()
