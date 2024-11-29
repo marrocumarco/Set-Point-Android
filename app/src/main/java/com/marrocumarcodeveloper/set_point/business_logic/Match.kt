@@ -9,6 +9,8 @@ interface Match {
 
     val player2GameScoreDescription: String
     val player1GameScoreDescription: String
+    val player1SetScore: Int
+    val player2SetScore: Int
     val pointButtonsDisabled: Boolean
     val showEndedMatchAlert: Boolean
     val showCurrentSetScore: Boolean

@@ -7,9 +7,12 @@ import java.util.ArrayList
 class MatchUseCase(private val match: Match) {
     val player1GameScoreDescription: String
         get() = match.player1GameScoreDescription
-
     val player2GameScoreDescription: String
         get() = match.player2GameScoreDescription
+    val player1SetScore: Int
+        get() = match.player1SetScore
+    val player2SetScore: Int
+        get() = match.player2SetScore
     val pointsButtonsDisabled: Boolean
         get() = match.pointButtonsDisabled
     val showEndedMatchAlert: Boolean

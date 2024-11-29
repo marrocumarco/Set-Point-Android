@@ -42,6 +42,8 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 endedSets = matchUseCase.endedSets,
                 player1GameScoreDescription = matchUseCase.player1GameScoreDescription,
                 player2GameScoreDescription = matchUseCase.player2GameScoreDescription,
+                player1SetScore = matchUseCase.player1SetScore,
+                player2SetScore = matchUseCase.player2SetScore,
                 showCurrentSetScore = matchUseCase.showCurrentSetScore,
                 showEndedMatchAlert = matchUseCase.showEndedMatchAlert,
                 pointButtonsDisabled = matchUseCase.pointsButtonsDisabled
@@ -57,6 +59,8 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 endedSets = matchUseCase.endedSets,
                 player1GameScoreDescription = matchUseCase.player1GameScoreDescription,
                 player2GameScoreDescription = matchUseCase.player2GameScoreDescription,
+                player1SetScore = matchUseCase.player1SetScore,
+                player2SetScore = matchUseCase.player2SetScore,
                 showCurrentSetScore = matchUseCase.showCurrentSetScore,
                 showEndedMatchAlert = matchUseCase.showEndedMatchAlert,
                 pointButtonsDisabled = matchUseCase.pointsButtonsDisabled

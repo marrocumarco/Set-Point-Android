@@ -11,6 +11,10 @@ class MatchImpl: Match {
     override var showEndedMatchAlert = false
     override var pointButtonsDisabled = false
     override var player1GameScoreDescription = Point.ZERO.name
+    override val player1SetScore: Int
+        get() = player1.games
+    override val player2SetScore: Int
+        get() = player2.games
     override var player2GameScoreDescription = Point.ZERO.name
 
     private var isTiebreak = false
