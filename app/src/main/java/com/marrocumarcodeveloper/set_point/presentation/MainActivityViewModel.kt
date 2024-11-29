@@ -23,12 +23,29 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
         _state.value = newState
     }
 
+    private fun updateState() {
+        updateState(
+            currentState().copy(
+                player1Serves = matchUseCase.player1Serves,
+                endedSets = matchUseCase.endedSets,
+                player1GameScoreDescription = matchUseCase.player1GameScoreDescription,
+                player2GameScoreDescription = matchUseCase.player2GameScoreDescription,
+                player1SetScore = matchUseCase.player1SetScore,
+                player2SetScore = matchUseCase.player2SetScore,
+                showCurrentSetScore = matchUseCase.showCurrentSetScore,
+                showEndedMatchAlert = matchUseCase.showEndedMatchAlert,
+                pointButtonsDisabled = matchUseCase.pointsButtonsDisabled
+            )
+        )
+    }
+
     // Process events sent from the view
     fun onEvent(event: MainViewEvent) {
         viewModelScope.launch {
             when (event) {
                 is OnClickPLayerOneScoredEvent -> onClickPlayerOneScoredEvent()
                 is OnClickPLayerTwoScoredEvent -> onClickPlayerTwoScoredEvent()
+                is OnClickResetScoreEvent -> onClickResetScoreEvent()
             }
         }
     }
@@ -36,35 +53,16 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
     // Handle the OnClickCountUpEvent
     private suspend fun onClickPlayerOneScoredEvent() {
         matchUseCase.pointWonByPlayerOne()
-        updateState(
-            currentState().copy(
-                player1Serves = matchUseCase.player1Serves,
-                endedSets = matchUseCase.endedSets,
-                player1GameScoreDescription = matchUseCase.player1GameScoreDescription,
-                player2GameScoreDescription = matchUseCase.player2GameScoreDescription,
-                player1SetScore = matchUseCase.player1SetScore,
-                player2SetScore = matchUseCase.player2SetScore,
-                showCurrentSetScore = matchUseCase.showCurrentSetScore,
-                showEndedMatchAlert = matchUseCase.showEndedMatchAlert,
-                pointButtonsDisabled = matchUseCase.pointsButtonsDisabled
-            )
-        )
+        updateState()
     }
 
     private suspend fun onClickPlayerTwoScoredEvent() {
         matchUseCase.pointWonByPlayerTwo()
-        updateState(
-            currentState().copy(
-                player1Serves = matchUseCase.player1Serves,
-                endedSets = matchUseCase.endedSets,
-                player1GameScoreDescription = matchUseCase.player1GameScoreDescription,
-                player2GameScoreDescription = matchUseCase.player2GameScoreDescription,
-                player1SetScore = matchUseCase.player1SetScore,
-                player2SetScore = matchUseCase.player2SetScore,
-                showCurrentSetScore = matchUseCase.showCurrentSetScore,
-                showEndedMatchAlert = matchUseCase.showEndedMatchAlert,
-                pointButtonsDisabled = matchUseCase.pointsButtonsDisabled
-            )
-        )
+        updateState()
+    }
+
+    private suspend fun onClickResetScoreEvent() {
+        matchUseCase.resetMatch()
+        updateState()
     }
 }

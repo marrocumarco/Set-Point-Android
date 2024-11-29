@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -27,12 +26,16 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Chip
-import androidx.wear.compose.material.ChipDefaults
+import androidx.navigation.NavHostController
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.CompactButton
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
+import androidx.wear.compose.navigation.SwipeDismissableNavHost
+import androidx.wear.compose.navigation.composable
+import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -50,60 +53,111 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun WearApp(viewModel: MainActivityViewModel) {
 
-    val state by viewModel.state.collectAsState()
-    TennisScoreScreen(state = state,
-        onReset = {},
+    NavigationScreen(viewModel = viewModel,
         onIncrementPlayer1 = { viewModel.onEvent(OnClickPLayerOneScoredEvent) },
-        onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) })
+        onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) },
+        onResetScore = { viewModel.onEvent(OnClickResetScoreEvent) })
 }
 
 @Composable
-fun TennisScoreScreen(
-    state: MainScreenState,
+fun NavigationScreen(
+    viewModel: MainActivityViewModel,
     player1Name: String = "P1",
     player2Name: String = "P2",
-    onReset: () -> Unit,
     onIncrementPlayer1: () -> Unit,
-    onIncrementPlayer2: () -> Unit
+    onIncrementPlayer2: () -> Unit,
+    onResetScore: () -> Unit
 ) {
+    val state by viewModel.state.collectAsState()
     Scaffold(timeText = {
         TimeText() // Mostra l'ora in alto
     }) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+        val navController = rememberSwipeDismissableNavController()
+        SwipeDismissableNavHost(
+            navController = navController,
+            startDestination = "tennis_match_screen"
         ) {
-            SetsScoreRow(
-                player1Name = player1Name, player2Name = player2Name, state = state
-            )
-//            Button(
-//                onClick = { onReset() },
-//                modifier = Modifier.padding(top = 16.dp)
-//            ) {
-//                Text(text = "Reset")
-//            }
+            composable("tennis_match_screen") {
+                tennisMatchScreen(
+                    player1Name,
+                    player2Name,
+                    state,
+                    onIncrementPlayer1,
+                    onIncrementPlayer2,
+                    onResetScore,
+                    navController
+                )
+            }
+            composable("second_screen_test") {
+                secondScreenTest()
+            }
+        }
+    }
+// ...
+// .. Screen level content goes here
+    //val scrollState = rememberScrollState()
 
-            //Spacer(modifier = Modifier.height(16.dp))
+    // ScreenScaffold(scrollState = scrollState) {
+    // Screen content goes here
+    //}
+}
 
+@Composable
+private fun secondScreenTest() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "prova secondo schermo")
+    }
+}
+
+@Composable
+private fun tennisMatchScreen(
+    player1Name: String,
+    player2Name: String,
+    state: MainScreenState,
+    onIncrementPlayer1: () -> Unit,
+    onIncrementPlayer2: () -> Unit,
+    onResetScore: () -> Unit,
+    navController: NavHostController
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row {
+            CompactButton(
+                onClick = { navController.navigate("second_screen_test") },
+            ) {
+                Text(text = "Settings")
+            }
+            CompactButton(
+                onClick = { onResetScore() },
+            ) {
+                Text(text = "Reset")
+            }
+        }
+        SetsScoreRow(
+            player1Name = player1Name, player2Name = player2Name, state = state
+        )
+
+        //Spacer(modifier = Modifier.height(16.dp))
+
+        Row {
             PlayerScoreRow(
                 state.player1GameScoreDescription, enabled = !state.pointButtonsDisabled
             ) {
                 onIncrementPlayer1()
             }
-
+            Spacer(modifier = Modifier.width(8.dp))
             PlayerScoreRow(
                 state.player2GameScoreDescription, enabled = !state.pointButtonsDisabled
             ) {
                 onIncrementPlayer2()
             }
-//            Row {
-//
-//
-//                Spacer(modifier = Modifier.width(8.dp))
-//
-//
-//            }
         }
     }
 }
@@ -138,13 +192,11 @@ fun SetsScoreRow(player1Name: String, player2Name: String, state: MainScreenStat
 
 @Composable
 fun PlayerScoreRow(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
-    Chip(onClick = { onIncrement() }, colors = ChipDefaults.primaryChipColors(), enabled = enabled,
-        modifier = Modifier.fillMaxWidth(fraction = 0.5f)) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = playerScore, style = MaterialTheme.typography.body2, fontSize = 20.sp
-            )
-        }
+    Button(
+        onClick = { onIncrement() }, enabled = enabled) {
+        Text(
+            text = playerScore, style = MaterialTheme.typography.body2, fontSize = 20.sp
+        )
     }
 }
 
