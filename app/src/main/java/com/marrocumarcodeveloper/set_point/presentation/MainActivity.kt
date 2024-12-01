@@ -10,32 +10,46 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.wear.compose.material.Button
+import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
+import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.material.CompactButton
-import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.material.icons.rounded.Settings
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
+import com.google.android.horologist.compose.layout.AppScaffold
+import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
+import com.marrocumarcodeveloper.set_point.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,6 +73,7 @@ fun WearApp(viewModel: MainActivityViewModel) {
         onResetScore = { viewModel.onEvent(OnClickResetScoreEvent) })
 }
 
+@OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun NavigationScreen(
     viewModel: MainActivityViewModel,
@@ -69,7 +84,8 @@ fun NavigationScreen(
     onResetScore: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    Scaffold(timeText = {
+
+    AppScaffold(timeText = {
         TimeText() // Mostra l'ora in alto
     }) {
         val navController = rememberSwipeDismissableNavController()
@@ -78,6 +94,7 @@ fun NavigationScreen(
             startDestination = "tennis_match_screen"
         ) {
             composable("tennis_match_screen") {
+
                 tennisMatchScreen(
                     player1Name,
                     player2Name,
@@ -102,17 +119,26 @@ fun NavigationScreen(
     //}
 }
 
+@OptIn(ExperimentalHorologistApi::class, ExperimentalWearFoundationApi::class)
 @Composable
 private fun secondScreenTest() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "prova secondo schermo")
+    val scrollState = rememberScrollState()
+    ScreenScaffold(scrollState = scrollState) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .rotaryWithScroll(scrollState, rememberActiveFocusRequester())
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            (1..100).forEach {
+                Text("i = $it")
+            }
+        }
     }
 }
 
+@OptIn(ExperimentalHorologistApi::class)
 @Composable
 private fun tennisMatchScreen(
     player1Name: String,
@@ -121,21 +147,29 @@ private fun tennisMatchScreen(
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
     onResetScore: () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        resetAndSettingsRow(navController, onResetScore)
+    val columnState = rememberColumnState()
+    ScreenScaffold {
+        ScalingLazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            columnState = columnState
+        ) {
+            item {
+                SetsScoreRow(
+                    player1Name = player1Name, player2Name = player2Name, state = state
+                )
+            }
+            item {
+                GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2)
+            }
 
-        SetsScoreRow(
-            player1Name = player1Name, player2Name = player2Name, state = state
-        )
-
-        GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2)
+            item {
+                ResetAndSettingsRow(navController, onResetScore)
+            }
+        }
     }
+
 }
 
 @Composable
@@ -160,7 +194,7 @@ private fun GameScoreRow(
 }
 
 @Composable
-private fun resetAndSettingsRow(
+private fun ResetAndSettingsRow(
     navController: NavHostController,
     onResetScore: () -> Unit
 ) {
@@ -168,12 +202,18 @@ private fun resetAndSettingsRow(
         CompactButton(
             onClick = { navController.navigate("second_screen_test") },
         ) {
-            Text(text = "Settings")
+            Icon(
+                Icons.Rounded.Settings,
+                contentDescription = ""
+            )
         }
         CompactButton(
             onClick = { onResetScore() },
         ) {
-            Text(text = "Reset")
+            Icon(
+                Icons.Rounded.RestartAlt,
+                contentDescription = ""
+            )
         }
     }
 }
@@ -207,10 +247,11 @@ private fun scoreColumn(player1Name: String, player2Name: String) {
 
 @Composable
 fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
+
     Button(
         onClick = { onIncrement() }, enabled = enabled) {
         Text(
-            text = playerScore, style = MaterialTheme.typography.body2, fontSize = 20.sp
+            text = playerScore, style = MaterialTheme.typography.bodySmall, fontSize = 20.sp
         )
     }
 }
