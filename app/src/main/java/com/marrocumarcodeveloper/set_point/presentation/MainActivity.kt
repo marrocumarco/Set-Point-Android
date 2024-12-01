@@ -10,13 +10,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
@@ -39,9 +44,14 @@ import androidx.wear.compose.material.CompactButton
 import androidx.wear.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.TimeText
+import androidx.wear.compose.material.dialog.Confirmation
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -51,8 +61,10 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
+import com.google.android.horologist.compose.layout.fillMaxRectangle
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
+import com.marrocumarcodeveloper.set_point.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -98,7 +110,7 @@ fun NavigationScreen(
         ) {
             composable("tennis_match_screen") {
 
-                tennisMatchScreen(
+                TennisMatchScreen(
                     player1Name,
                     player2Name,
                     state,
@@ -109,7 +121,7 @@ fun NavigationScreen(
                 )
             }
             composable("second_screen_test") {
-                secondScreenTest()
+                //secondScreenTest()
             }
         }
     }
@@ -141,9 +153,9 @@ private fun secondScreenTest() {
     }
 }
 
-@OptIn(ExperimentalHorologistApi::class)
+@OptIn(ExperimentalHorologistApi::class, ExperimentalAnimationGraphicsApi::class)
 @Composable
-private fun tennisMatchScreen(
+private fun TennisMatchScreen(
     player1Name: String,
     player2Name: String,
     state: MainScreenState,
@@ -154,13 +166,40 @@ private fun tennisMatchScreen(
 ) {
     val columnState = rememberColumnState(
         factory = ScalingLazyColumnDefaults.responsive(
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-            rotaryMode = ScalingLazyColumnState.RotaryMode.Snap
+            userScrollEnabled = false
         ),
     )
+    if (state.showEndedMatchAlert) {
+        GameOverConfirmation(state.winnerDescription, onResetScore)
+    } else {
+        MatchScoreBoard(
+            columnState,
+            player1Name,
+            player2Name,
+            state,
+            onIncrementPlayer1,
+            onIncrementPlayer2,
+            navController,
+            onResetScore
+        )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalHorologistApi::class)
+private fun MatchScoreBoard(
+    columnState: ScalingLazyColumnState,
+    player1Name: String,
+    player2Name: String,
+    state: MainScreenState,
+    onIncrementPlayer1: () -> Unit,
+    onIncrementPlayer2: () -> Unit,
+    navController: NavHostController,
+    onResetScore: () -> Unit
+) {
     ScreenScaffold {
         ScalingLazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxRectangle(),
             columnState = columnState
         ) {
             item {
@@ -171,13 +210,44 @@ private fun tennisMatchScreen(
             item {
                 GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2)
             }
-
             item {
                 ResetAndSettingsRow(navController, onResetScore)
             }
         }
     }
+}
 
+@Composable
+@OptIn(ExperimentalAnimationGraphicsApi::class)
+private fun GameOverConfirmation(winnerDescription: String, onResetScore: () -> Unit) {
+    val animation = AnimatedImageVector.animatedVectorResource(R.drawable.checkmark_animation)
+    Confirmation(
+        onTimeout = {
+            /* Do something e.g. navController.popBackStack() */
+        },
+        icon = {
+            // Initially, animation is static and shown at the start position (atEnd = false).
+            // Then, we use the EffectAPI to trigger a state change to atEnd = true,
+            // which plays the animation from start to end.
+            var atEnd by remember { mutableStateOf(false) }
+            DisposableEffect(Unit) {
+                atEnd = true
+                onDispose {}
+            }
+            Image(
+                painter = rememberAnimatedVectorPainter(animation, atEnd),
+                contentDescription = "Open on phone",
+                modifier = Modifier.size(48.dp)
+            )
+        },
+        durationMillis = animation.totalDuration * 2L,
+    ) {
+        Text(
+            text = "$winnerDescription wins!",
+            textAlign = TextAlign.Center
+        )
+        ResetButton(onResetScore)
+    }
 }
 
 @Composable
@@ -215,14 +285,19 @@ private fun ResetAndSettingsRow(
 //                contentDescription = ""
 //            )
 //        }
-        CompactButton(
-            onClick = { onResetScore() },
-        ) {
-            Icon(
-                Icons.Rounded.RestartAlt,
-                contentDescription = ""
-            )
-        }
+        ResetButton(onResetScore)
+    }
+}
+
+@Composable
+private fun ResetButton(onResetScore: () -> Unit) {
+    CompactButton(
+        onClick = { onResetScore() },
+    ) {
+        Icon(
+            Icons.Rounded.RestartAlt,
+            contentDescription = ""
+        )
     }
 }
 
@@ -230,7 +305,6 @@ private fun ResetAndSettingsRow(
 fun SetsScoreRow(player1Name: String, player2Name: String, state: MainScreenState) {
     Row(
         modifier = Modifier
-            .padding(20.dp)
             .fillMaxWidth()
             .wrapContentSize(Alignment.CenterStart)
     ) {
@@ -267,8 +341,7 @@ fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> 
             )
         }, onClick = { onIncrement() },
         enabled = enabled,
-        shape = MaterialTheme.shapes.large
-    )
+        shape = MaterialTheme.shapes.large)
 }
 
 

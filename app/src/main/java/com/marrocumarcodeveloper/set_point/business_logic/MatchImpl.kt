@@ -11,6 +11,8 @@ class MatchImpl: Match {
     override var showEndedMatchAlert = false
     override var pointButtonsDisabled = false
     override var player1GameScoreDescription = Point.ZERO.name
+    override val winnerDescription: String
+        get() = winner?.name ?: ""
     override val player1SetScore: Int
         get() = player1.games
     override val player2SetScore: Int
@@ -20,7 +22,7 @@ class MatchImpl: Match {
     private var isTiebreak = false
     private var winner: Player? = null
     private var isTiebreakEnabled = true
-    private var numberOfSetsNeededToWin = 3
+    private var numberOfSetsNeededToWin = 2
 
     private fun pointWonBy(player: Player) {
         val opponent = if (player === player1) player2 else player1

@@ -9,6 +9,8 @@ class MatchUseCase(private val match: Match) {
         get() = match.player1GameScoreDescription
     val player2GameScoreDescription: String
         get() = match.player2GameScoreDescription
+    val winnerDescription: String
+        get() = match.winnerDescription
     val player1SetScore: Int
         get() = match.player1SetScore
     val player2SetScore: Int
