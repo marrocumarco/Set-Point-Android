@@ -10,15 +10,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,7 +28,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,7 +39,8 @@ import androidx.wear.compose.material.CompactButton
 import androidx.wear.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.RestartAlt
-import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.ui.text.style.TextAlign
+import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
@@ -46,10 +48,11 @@ import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.AppScaffold
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
+import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
-import com.marrocumarcodeveloper.set_point.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -149,10 +152,15 @@ private fun tennisMatchScreen(
     onResetScore: () -> Unit,
     navController: NavHostController,
 ) {
-    val columnState = rememberColumnState()
+    val columnState = rememberColumnState(
+        factory = ScalingLazyColumnDefaults.responsive(
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+            rotaryMode = ScalingLazyColumnState.RotaryMode.Snap
+        ),
+    )
     ScreenScaffold {
         ScalingLazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
             columnState = columnState
         ) {
             item {
@@ -178,7 +186,7 @@ private fun GameScoreRow(
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit
 ) {
-    Row {
+    Row(horizontalArrangement = Arrangement.SpaceBetween) {
         PlayerScoreButton(
             state.player1GameScoreDescription, enabled = !state.pointButtonsDisabled
         ) {
@@ -199,14 +207,14 @@ private fun ResetAndSettingsRow(
     onResetScore: () -> Unit
 ) {
     Row {
-        CompactButton(
-            onClick = { navController.navigate("second_screen_test") },
-        ) {
-            Icon(
-                Icons.Rounded.Settings,
-                contentDescription = ""
-            )
-        }
+//        CompactButton(
+//            onClick = { navController.navigate("second_screen_test") },
+//        ) {
+//            Icon(
+//                Icons.Rounded.Settings,
+//                contentDescription = ""
+//            )
+//        }
         CompactButton(
             onClick = { onResetScore() },
         ) {
@@ -221,24 +229,27 @@ private fun ResetAndSettingsRow(
 @Composable
 fun SetsScoreRow(player1Name: String, player2Name: String, state: MainScreenState) {
     Row(
-        modifier = Modifier.padding(20.dp)
+        modifier = Modifier
+            .padding(20.dp)
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.CenterStart)
     ) {
-        scoreColumn(player1Name, player2Name)
+        ScoreColumn(player1Name, player2Name)
         Spacer(modifier = Modifier.width(8.dp))
 
         for (set in state.endedSets) {
-            scoreColumn(set.player1Score.toString(), set.player2Score.toString())
+            ScoreColumn(set.player1Score.toString(), set.player2Score.toString())
             Spacer(modifier = Modifier.width(8.dp))
         }
 
         if (state.showCurrentSetScore) {
-            scoreColumn(state.player1SetScore.toString(), state.player2SetScore.toString())
+            ScoreColumn(state.player1SetScore.toString(), state.player2SetScore.toString())
         }
     }
 }
 
 @Composable
-private fun scoreColumn(player1Name: String, player2Name: String) {
+private fun ScoreColumn(player1Name: String, player2Name: String) {
     Column {
         Text(text = player1Name)
         Text(text = player2Name)
@@ -247,13 +258,17 @@ private fun scoreColumn(player1Name: String, player2Name: String) {
 
 @Composable
 fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
-
-    Button(
-        onClick = { onIncrement() }, enabled = enabled) {
-        Text(
-            text = playerScore, style = MaterialTheme.typography.bodySmall, fontSize = 20.sp
-        )
-    }
+    Chip(modifier = Modifier
+        .wrapContentSize(Alignment.Center),
+        label = {
+            Text(
+                text = playerScore, style = MaterialTheme.typography.bodySmall, fontSize = 17.sp,
+                textAlign = TextAlign.Center
+            )
+        }, onClick = { onIncrement() },
+        enabled = enabled,
+        shape = MaterialTheme.shapes.large
+    )
 }
 
 
