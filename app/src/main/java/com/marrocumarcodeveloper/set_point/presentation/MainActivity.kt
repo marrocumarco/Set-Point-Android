@@ -128,36 +128,52 @@ private fun tennisMatchScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row {
-            CompactButton(
-                onClick = { navController.navigate("second_screen_test") },
-            ) {
-                Text(text = "Settings")
-            }
-            CompactButton(
-                onClick = { onResetScore() },
-            ) {
-                Text(text = "Reset")
-            }
-        }
+        resetAndSettingsRow(navController, onResetScore)
+
         SetsScoreRow(
             player1Name = player1Name, player2Name = player2Name, state = state
         )
 
-        //Spacer(modifier = Modifier.height(16.dp))
+        GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2)
+    }
+}
 
-        Row {
-            PlayerScoreRow(
-                state.player1GameScoreDescription, enabled = !state.pointButtonsDisabled
-            ) {
-                onIncrementPlayer1()
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            PlayerScoreRow(
-                state.player2GameScoreDescription, enabled = !state.pointButtonsDisabled
-            ) {
-                onIncrementPlayer2()
-            }
+@Composable
+private fun GameScoreRow(
+    state: MainScreenState,
+    onIncrementPlayer1: () -> Unit,
+    onIncrementPlayer2: () -> Unit
+) {
+    Row {
+        PlayerScoreButton(
+            state.player1GameScoreDescription, enabled = !state.pointButtonsDisabled
+        ) {
+            onIncrementPlayer1()
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        PlayerScoreButton(
+            state.player2GameScoreDescription, enabled = !state.pointButtonsDisabled
+        ) {
+            onIncrementPlayer2()
+        }
+    }
+}
+
+@Composable
+private fun resetAndSettingsRow(
+    navController: NavHostController,
+    onResetScore: () -> Unit
+) {
+    Row {
+        CompactButton(
+            onClick = { navController.navigate("second_screen_test") },
+        ) {
+            Text(text = "Settings")
+        }
+        CompactButton(
+            onClick = { onResetScore() },
+        ) {
+            Text(text = "Reset")
         }
     }
 }
@@ -167,31 +183,30 @@ fun SetsScoreRow(player1Name: String, player2Name: String, state: MainScreenStat
     Row(
         modifier = Modifier.padding(20.dp)
     ) {
-        Column {
-            Text(text = player1Name)
-            Text(text = player2Name)
-        }
+        scoreColumn(player1Name, player2Name)
         Spacer(modifier = Modifier.width(8.dp))
 
         for (set in state.endedSets) {
-            Column {
-                Text(text = set.player1Score.toString())
-                Text(text = set.player2Score.toString())
-            }
+            scoreColumn(set.player1Score.toString(), set.player2Score.toString())
             Spacer(modifier = Modifier.width(8.dp))
         }
 
         if (state.showCurrentSetScore) {
-            Column {
-                Text(text = state.player1SetScore.toString())
-                Text(text = state.player2SetScore.toString())
-            }
+            scoreColumn(state.player1SetScore.toString(), state.player2SetScore.toString())
         }
     }
 }
 
 @Composable
-fun PlayerScoreRow(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
+private fun scoreColumn(player1Name: String, player2Name: String) {
+    Column {
+        Text(text = player1Name)
+        Text(text = player2Name)
+    }
+}
+
+@Composable
+fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
     Button(
         onClick = { onIncrement() }, enabled = enabled) {
         Text(
@@ -204,5 +219,5 @@ fun PlayerScoreRow(playerScore: String, enabled: Boolean, onIncrement: () -> Uni
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    PlayerScoreRow("1", true, {})
+    PlayerScoreButton("1", true, {})
 }
