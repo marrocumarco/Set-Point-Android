@@ -1,16 +1,23 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
-class MatchImpl: Match {
+class MatchImpl : Match {
 
-    val player1 = Player("P1")
-    val player2 = Player("P2")
+    private val player1 = Player("P1")
+    private val player2 = Player("P2")
 
     override var player1Serves = true
+        private set
     override var endedSets = ArrayList<EndedSet>()
+        private set
     override var showCurrentSetScore = true
+        private set
     override var showEndedMatchAlert = false
+        private set
     override var pointButtonsDisabled = false
+        private set
     override var player1GameScoreDescription = Point.ZERO.name
+        private set
+
     override val winnerDescription: String
         get() = winner?.name ?: ""
     override val player1SetScore: Int
@@ -18,77 +25,164 @@ class MatchImpl: Match {
     override val player2SetScore: Int
         get() = player2.games
     override var player2GameScoreDescription = Point.ZERO.name
+        private set
 
     private var isTiebreak = false
     private var winner: Player? = null
     private var isTiebreakEnabled = true
     private var numberOfSetsNeededToWin = 2
 
-    private fun pointWonBy(player: Player) {
-        val opponent = if (player === player1) player2 else player1
-        if (isTiebreakEnabled && isTiebreak) {
-            player.points += 1
-            checkSetWin(player)
-            if (((player.points + opponent.points) % 2) == 1) {
-                player1Serves = !player1Serves
-            }
-        } else if (player.points + 1 == Point.ADVANTAGE.value &&
+    override suspend fun pointWonByPlayerOne() {
+        pointWonBy(player1, player2)
+    }
+
+    override suspend fun pointWonByPlayerTwo() {
+        pointWonBy(player2, player1)
+    }
+
+    private fun pointWonBy(player: Player, opponent: Player) {
+        if (getIsTiebreakMode()) {
+            addPointInTiebreakMode(player, opponent)
+        } else if (needToResetScoreToDeuce(player, opponent))
+            resetScoreToForty(opponent)
+        else {
+            addPointTo(player)
+            checkGameWin(player, opponent)
+        }
+        updateScoreDescriptions()
+    }
+
+    private fun getIsTiebreakMode(): Boolean =
+        isTiebreakEnabled && isTiebreak
+
+    private fun addPointInTiebreakMode(
+        player: Player,
+        opponent: Player
+    ) {
+        player.points += 1
+        checkSetWin(player, opponent)
+        if (needToSwitchPlayerOnServiceDuringTiebreak(player, opponent)) {
+            switchPlayerOnService()
+        }
+    }
+
+    private fun needToSwitchPlayerOnServiceDuringTiebreak(
+        player: Player,
+        opponent: Player
+    ) = ((player.points + opponent.points) % 2) == 1
+
+    private fun needToResetScoreToDeuce(
+        player: Player,
+        opponent: Player
+    ) = player.points + 1 == Point.ADVANTAGE.value &&
             opponent.points == Point.ADVANTAGE.value
-        ) opponent.points = Point.FORTY.value else {
-            player.points = (player.points + 1) % 6
-            checkGameWin(player)
-        }
-        // deuce: score reset to 40 all
 
-        calculatePointDescription(player)
-        calculatePointDescription(opponent)
+    private fun resetScoreToForty(opponent: Player) {
+        opponent.points = Point.FORTY.value
     }
 
-    private fun checkGameWin(player: Player) {
-        val opponent = if (player === player1) player2 else player1
-        if (player.points >= 4 && player.points >= opponent.points + 2) {
-            player.games += 1
-            player.resetPoints()
-            opponent.resetPoints()
-            player1Serves = !player1Serves
-            calculatePointDescription(player)
-            calculatePointDescription(opponent)
-            checkSetWin(player)
+    private fun addPointTo(player: Player) {
+        player.points = (player.points + 1) % 6
+    }
+
+    private fun checkGameWin(player: Player, opponent: Player) {
+        if (gameEnded(player, opponent)) {
+            increaseGamesCounter(player)
+            resetGameScore(player, opponent)
+            switchPlayerOnService()
+            updateScoreDescriptions()
+            checkSetWin(player, opponent)
         }
     }
 
-    private fun checkSetWin(player: Player) {
-        val opponent = if (player === player1) player2 else player1
-        var setWin = false
-        if (isTiebreakEnabled && isTiebreak) {
-            if (player.points >= 7 && player.points >= opponent.points + 2) {
-                setWin = true
-                player.games += 1
-                player.resetPoints()
-                opponent.resetPoints()
+    private fun switchPlayerOnService() {
+        player1Serves = !player1Serves
+    }
+
+    private fun increaseGamesCounter(player: Player) {
+        player.games += 1
+    }
+
+    private fun gameEnded(
+        player: Player,
+        opponent: Player
+    ) = player.points >= 4 && player.points >= opponent.points + 2
+
+    private fun checkSetWin(player: Player, opponent: Player) {
+        var setEnded = false
+        if (getIsTiebreakMode()) {
+            if (tiebreakEnded(player, opponent)) {
+                setEnded = true
+                increaseGamesCounter(player)
+                resetGameScore(player, opponent)
             }
         } else {
-            setWin = player.games >= 6 && player.games >= opponent.games + 2
+            setEnded = setEnded(player, opponent)
         }
-        if (setWin) {
-            player.sets += 1
-            endedSets.add(
-                EndedSet(
-                    player1.games,
-                    player2.games
-                )
-            )
-            player.resetGames()
-            opponent.resetGames()
+        handleEndedSet(setEnded, player, opponent)
+    }
+
+    private fun handleEndedSet(
+        setEnded: Boolean,
+        player: Player,
+        opponent: Player
+    ) {
+        if (setEnded) {
+            increaseSetsCounter(player)
+            archiveEndedSet()
+            resetPlayersGames(player, opponent)
             isTiebreak = false
             checkMatchWin(player)
         } else {
-            if (isTiebreakEnabled && !isTiebreak && player.games == 6 && opponent.games == 6) {
+            if (shouldEnableTiebreak(player, opponent)) {
                 isTiebreak = true
-                player.resetPoints()
-                opponent.resetPoints()
+                resetGameScore(player, opponent)
             }
         }
+    }
+
+    private fun archiveEndedSet() {
+        endedSets.add(
+            EndedSet(
+                player1.games,
+                player2.games
+            )
+        )
+    }
+
+    private fun shouldEnableTiebreak(
+        player: Player,
+        opponent: Player
+    ) = isTiebreakEnabled && !isTiebreak && player.games == 6 && opponent.games == 6
+
+    private fun resetPlayersGames(
+        player: Player,
+        opponent: Player
+    ) {
+        player.resetGames()
+        opponent.resetGames()
+    }
+
+    private fun increaseSetsCounter(player: Player) {
+        player.sets += 1
+    }
+
+    private fun setEnded(
+        player: Player,
+        opponent: Player
+    ) = player.games >= 6 && player.games >= opponent.games + 2
+
+    private fun tiebreakEnded(
+        player: Player,
+        opponent: Player
+    ) = player.points >= 7 && player.points >= opponent.points + 2
+
+    private fun resetGameScore(
+        player: Player,
+        opponent: Player
+    ) {
+        player.resetPoints()
+        opponent.resetPoints()
     }
 
     private fun checkMatchWin(player: Player) {
@@ -101,31 +195,38 @@ class MatchImpl: Match {
     }
 
     override suspend fun resetMatch() {
-        player1.resetPoints()
-        player1.resetGames()
-        player1.resetSets()
-        player2.resetPoints()
-        player2.resetGames()
-        player2.resetSets()
-        endedSets.clear()
+        resetGameScore(player1, player2)
+        resetSetScore()
+        resetMatchScore()
+        resetFlags()
+        updateScoreDescriptions()
+    }
+
+    private fun resetFlags() {
         isTiebreak = false
         showCurrentSetScore = true
         showEndedMatchAlert = false
         pointButtonsDisabled = false
         player1Serves = true
-        calculatePointDescription(player1)
-        calculatePointDescription(player2)
     }
 
-    override suspend fun pointWonByPlayerOne() {
-        pointWonBy(player1)
+    private fun resetMatchScore() {
+        player1.resetSets()
+        player2.resetSets()
+        endedSets.clear()
     }
 
-    override suspend fun pointWonByPlayerTwo() {
-        pointWonBy(player2)
+    private fun resetSetScore() {
+        player1.resetGames()
+        player2.resetGames()
     }
 
-    private fun calculatePointDescription(player: Player) {
+    private fun updateScoreDescriptions() {
+        player1GameScoreDescription = calculatePointDescription(player1)
+        player2GameScoreDescription = calculatePointDescription(player2)
+    }
+
+    private fun calculatePointDescription(player: Player): String {
         var pointsDescription = ""
         if (isTiebreak) {
             pointsDescription = player.points.toString()
@@ -139,11 +240,6 @@ class MatchImpl: Match {
                 Point.GAMEWON.value -> pointsDescription = "W"
             }
         }
-
-        if (player === player1) {
-            player1GameScoreDescription = pointsDescription
-        } else {
-            player2GameScoreDescription = pointsDescription
-        }
+        return pointsDescription
     }
 }
