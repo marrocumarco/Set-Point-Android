@@ -1,6 +1,6 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
-class MatchImpl : Match {
+class MatchImpl(settings: Settings) : Match {
 
     private val player1 = Player("P1")
     private val player2 = Player("P2")
@@ -29,8 +29,8 @@ class MatchImpl : Match {
 
     private var isTiebreak = false
     private var winner: Player? = null
-    private var isTiebreakEnabled = true
-    private var numberOfSetsNeededToWin = 2
+    private var isTiebreakEnabled = settings.getTiebreakEnabled()
+    private var numberOfSetsNeededToWin = (settings.getSelectedNumberOfSets() / 2) + 1
 
     override suspend fun pointWonByPlayerOne() {
         pointWonBy(player1, player2)
