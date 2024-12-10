@@ -1,16 +1,23 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
-class SettingsImpl : Settings {
+import android.content.SharedPreferences
+
+class SettingsImpl(val sharedPref: SharedPreferences) : Settings {
+
     private val numberOfSets = intArrayOf(1,3,5)
-    private var selectedNumberOfSets: Int = defaultNumberOfSets
-    private var tieBreakEnabled = true
+    //private var selectedNumberOfSets: Int = defaultNumberOfSets
+    private var defaultTieBreakEnabled = true
 
     override fun setSelectedNumberOfSets(numberOfSets: Int) {
-        selectedNumberOfSets = numberOfSets
+        //selectedNumberOfSets = numberOfSets
+        sharedPref.edit().apply {
+            putInt(NUMBER_OF_SETS, numberOfSets)
+            commit()
+        }
     }
 
     override fun getSelectedNumberOfSets(): Int {
-        return selectedNumberOfSets
+        return sharedPref.getInt(NUMBER_OF_SETS, defaultNumberOfSets)
     }
 
     override fun getNumberOfSets(): IntArray {
@@ -18,14 +25,21 @@ class SettingsImpl : Settings {
     }
 
     override fun setTiebreakEnabled(enabled: Boolean) {
-        tieBreakEnabled = enabled
+        sharedPref.edit().apply {
+            putBoolean(
+                TIEBREAK_ENABLED, enabled)
+            commit()
+        }
     }
 
     override fun getTiebreakEnabled(): Boolean {
-        return tieBreakEnabled
+        return sharedPref.getBoolean(TIEBREAK_ENABLED, defaultTieBreakEnabled)
     }
 
     companion object {
+        const val NUMBER_OF_SETS = "number_of_sets"
+        const val TIEBREAK_ENABLED = "tiebreak_enabled"
+
         const val defaultNumberOfSets = 3
     }
 }
