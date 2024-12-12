@@ -98,7 +98,7 @@ fun NavigationScreen(
     onIncrementPlayer2: () -> Unit,
     onResetScore: () -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.mainScreenState.collectAsState()
 
     AppScaffold(timeText = {
         TimeText() // Mostra l'ora in alto
@@ -136,7 +136,7 @@ fun NavigationScreen(
 
 @OptIn(ExperimentalHorologistApi::class, ExperimentalWearFoundationApi::class)
 @Composable
-private fun secondScreenTest() {
+private fun SecondScreenTest() {
     val scrollState = rememberScrollState()
     ScreenScaffold(scrollState = scrollState) {
         Column(

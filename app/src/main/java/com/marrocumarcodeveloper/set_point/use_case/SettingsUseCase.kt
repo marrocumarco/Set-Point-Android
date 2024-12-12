@@ -3,8 +3,8 @@ package com.marrocumarcodeveloper.set_point.use_case
 import com.marrocumarcodeveloper.set_point.business_logic.Settings
 
 class SettingsUseCase(private val settings: Settings) {
-    fun setNumberOfSets(numberOfSets: Int) {
-        settings.setSelectedNumberOfSets(numberOfSets)
+    fun getNumberOfSets(): IntArray {
+        return settings.getNumberOfSets()
     }
 
     fun setSelectedNumberOfSets(numberOfSets: Int) {
@@ -15,10 +15,6 @@ class SettingsUseCase(private val settings: Settings) {
         return settings.getSelectedNumberOfSets()
     }
 
-    fun getNumberOfSets(): IntArray {
-        return settings.getNumberOfSets()
-    }
-
     fun setTiebreakEnabled(enabled: Boolean) {
         settings.setTiebreakEnabled(enabled)
     }
@@ -26,5 +22,4 @@ class SettingsUseCase(private val settings: Settings) {
     fun getTiebreakEnabled(): Boolean {
         return settings.getTiebreakEnabled()
     }
-
 }

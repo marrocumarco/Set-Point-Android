@@ -9,18 +9,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchUseCase) : ViewModel() {
     // State is maintained using StateFlow
-    private val _state = MutableStateFlow(MainScreenState.initValue)
-    val state: StateFlow<MainScreenState> = _state.asStateFlow()
+    private val _mainScreenState = MutableStateFlow(MainScreenState.initValue)
+    val mainScreenState: StateFlow<MainScreenState> = _mainScreenState.asStateFlow()
 
     // Function to get the current state
-    private fun currentState(): MainScreenState = _state.value
+    private fun currentState(): MainScreenState = _mainScreenState.value
 
     // Function to update the state
     private fun updateState(newState: MainScreenState) {
-        _state.value = newState
+        _mainScreenState.value = newState
     }
 
     private fun updateState() {

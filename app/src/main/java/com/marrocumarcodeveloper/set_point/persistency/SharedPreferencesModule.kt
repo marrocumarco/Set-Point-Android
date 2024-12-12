@@ -1,4 +1,4 @@
-package com.marrocumarcodeveloper.set_point
+package com.marrocumarcodeveloper.set_point.persistency
 
 import android.content.Context
 import android.content.SharedPreferences
