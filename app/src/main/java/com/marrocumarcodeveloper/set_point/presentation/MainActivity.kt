@@ -44,11 +44,13 @@ import androidx.wear.compose.material.CompactButton
 import androidx.wear.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.dialog.Confirmation
@@ -71,18 +73,21 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WearApp(viewModel)
+            WearApp(viewModel, settingsViewModel = settingsViewModel)
         }
     }
 }
 
 @Composable
-fun WearApp(viewModel: MainActivityViewModel) {
+fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewModel) {
 
     NavigationScreen(viewModel = viewModel,
+        settingsViewModel = settingsViewModel,
         onIncrementPlayer1 = { viewModel.onEvent(OnClickPLayerOneScoredEvent) },
         onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) },
         onResetScore = { viewModel.onEvent(OnClickResetScoreEvent) })
@@ -92,6 +97,7 @@ fun WearApp(viewModel: MainActivityViewModel) {
 @Composable
 fun NavigationScreen(
     viewModel: MainActivityViewModel,
+    settingsViewModel: SettingsViewModel,
     player1Name: String = "P1",
     player2Name: String = "P2",
     onIncrementPlayer1: () -> Unit,
@@ -109,7 +115,6 @@ fun NavigationScreen(
             startDestination = "tennis_match_screen"
         ) {
             composable("tennis_match_screen") {
-
                 TennisMatchScreen(
                     player1Name,
                     player2Name,
@@ -121,7 +126,7 @@ fun NavigationScreen(
                 )
             }
             composable("second_screen_test") {
-                //secondScreenTest()
+                SecondScreenTest(settingsViewModel)
             }
         }
     }
@@ -136,7 +141,8 @@ fun NavigationScreen(
 
 @OptIn(ExperimentalHorologistApi::class, ExperimentalWearFoundationApi::class)
 @Composable
-private fun SecondScreenTest() {
+private fun SecondScreenTest(settingsViewModel: SettingsViewModel) {
+    val state = settingsViewModel.settingsScreenState.collectAsState()
     val scrollState = rememberScrollState()
     ScreenScaffold(scrollState = scrollState) {
         Column(
@@ -146,8 +152,10 @@ private fun SecondScreenTest() {
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            (1..100).forEach {
-                Text("i = $it")
+            val numberOfSets = state.value.selectedNumberOfSets
+            Text(text = "Number of sets: $numberOfSets")
+            Button(onClick = { settingsViewModel.onTiebreakEnabledStateChanged(!state.value.tiebreakEnabled) }) {
+                Text(text = if (state.value.tiebreakEnabled) { "tiebreak enabled" } else { "tiebreak disabled"})
             }
         }
     }
@@ -277,14 +285,14 @@ private fun ResetAndSettingsRow(
     onResetScore: () -> Unit
 ) {
     Row {
-//        CompactButton(
-//            onClick = { navController.navigate("second_screen_test") },
-//        ) {
-//            Icon(
-//                Icons.Rounded.Settings,
-//                contentDescription = ""
-//            )
-//        }
+        CompactButton(
+            onClick = { navController.navigate("second_screen_test") },
+        ) {
+            Icon(
+                Icons.Rounded.Settings,
+                contentDescription = ""
+            )
+        }
         ResetButton(onResetScore)
     }
 }
