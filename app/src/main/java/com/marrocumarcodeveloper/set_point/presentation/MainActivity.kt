@@ -43,7 +43,7 @@ import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.material.CompactButton
 import androidx.wear.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -90,7 +90,8 @@ fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewMod
         settingsViewModel = settingsViewModel,
         onIncrementPlayer1 = { viewModel.onEvent(OnClickPLayerOneScoredEvent) },
         onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) },
-        onResetScore = { viewModel.onEvent(OnClickResetScoreEvent) })
+        onUndo = { viewModel.onEvent(OnClickUndoEvent) },
+        onShowSettings = { viewModel.onEvent(OnClickSettingsEvent) })
 }
 
 @OptIn(ExperimentalHorologistApi::class)
@@ -102,7 +103,8 @@ fun NavigationScreen(
     player2Name: String = "P2",
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
-    onResetScore: () -> Unit
+    onUndo: () -> Unit,
+    onShowSettings: () -> Unit
 ) {
     val state by viewModel.mainScreenState.collectAsState()
 
@@ -121,7 +123,8 @@ fun NavigationScreen(
                     state,
                     onIncrementPlayer1,
                     onIncrementPlayer2,
-                    onResetScore,
+                    onUndo,
+                    onShowSettings,
                     navController
                 )
             }
@@ -169,7 +172,8 @@ private fun TennisMatchScreen(
     state: MainScreenState,
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
-    onResetScore: () -> Unit,
+    onUndo: () -> Unit,
+    onShowSettings: () -> Unit,
     navController: NavHostController,
 ) {
     val columnState = rememberColumnState(
@@ -178,7 +182,9 @@ private fun TennisMatchScreen(
         ),
     )
     if (state.showEndedMatchAlert) {
-        GameOverConfirmation(state.winnerDescription, onResetScore)
+        GameOverConfirmation(state.winnerDescription, onUndo)
+    } else if (state.showSettingsView) {
+        navController.navigate("second_screen_test")
     } else {
         MatchScoreBoard(
             columnState,
@@ -187,8 +193,8 @@ private fun TennisMatchScreen(
             state,
             onIncrementPlayer1,
             onIncrementPlayer2,
-            navController,
-            onResetScore
+            onUndo,
+            onShowSettings
         )
     }
 }
@@ -202,8 +208,8 @@ private fun MatchScoreBoard(
     state: MainScreenState,
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
-    navController: NavHostController,
-    onResetScore: () -> Unit
+    onResetScore: () -> Unit,
+    onShowSettings: () -> Unit
 ) {
     ScreenScaffold {
         ScalingLazyColumn(
@@ -219,7 +225,7 @@ private fun MatchScoreBoard(
                 GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2)
             }
             item {
-                ResetAndSettingsRow(navController, onResetScore)
+                ResetAndSettingsRow(state, onResetScore, onShowSettings)
             }
         }
     }
@@ -227,7 +233,7 @@ private fun MatchScoreBoard(
 
 @Composable
 @OptIn(ExperimentalAnimationGraphicsApi::class)
-private fun GameOverConfirmation(winnerDescription: String, onResetScore: () -> Unit) {
+private fun GameOverConfirmation(winnerDescription: String, onUndo: () -> Unit) {
     val animation = AnimatedImageVector.animatedVectorResource(R.drawable.checkmark_animation)
     Confirmation(
         onTimeout = {
@@ -254,7 +260,7 @@ private fun GameOverConfirmation(winnerDescription: String, onResetScore: () -> 
             text = "$winnerDescription wins!",
             textAlign = TextAlign.Center
         )
-        ResetButton(onResetScore)
+        UndoButton(true, onUndo)
     }
 }
 
@@ -266,13 +272,13 @@ private fun GameScoreRow(
 ) {
     Row(horizontalArrangement = Arrangement.SpaceBetween) {
         PlayerScoreButton(
-            state.player1GameScoreDescription, enabled = !state.pointButtonsDisabled
+            state.player1GameScoreDescription, enabled = state.pointButtonsEnabled
         ) {
             onIncrementPlayer1()
         }
         Spacer(modifier = Modifier.width(8.dp))
         PlayerScoreButton(
-            state.player2GameScoreDescription, enabled = !state.pointButtonsDisabled
+            state.player2GameScoreDescription, enabled = state.pointButtonsEnabled
         ) {
             onIncrementPlayer2()
         }
@@ -281,29 +287,31 @@ private fun GameScoreRow(
 
 @Composable
 private fun ResetAndSettingsRow(
-    navController: NavHostController,
-    onResetScore: () -> Unit
+    state: MainScreenState,
+    onResetScore: () -> Unit,
+    onShowSettings: () -> Unit
 ) {
     Row {
         CompactButton(
-            onClick = { navController.navigate("second_screen_test") },
+            onClick = { onShowSettings },
         ) {
             Icon(
                 Icons.Rounded.Settings,
                 contentDescription = ""
             )
         }
-        ResetButton(onResetScore)
+        UndoButton(state.undoButtonEnabled, onResetScore)
     }
 }
 
 @Composable
-private fun ResetButton(onResetScore: () -> Unit) {
+private fun UndoButton(enabled: Boolean, onUndo: () -> Unit) {
     CompactButton(
-        onClick = { onResetScore() },
+        onClick = { onUndo() },
+        enabled = enabled
     ) {
         Icon(
-            Icons.Rounded.RestartAlt,
+            Icons.AutoMirrored.Rounded.Undo,
             contentDescription = ""
         )
     }
@@ -319,10 +327,10 @@ fun SetsScoreRow(player1Name: String, player2Name: String, state: MainScreenStat
         ScoreColumn(player1Name, player2Name)
         Spacer(modifier = Modifier.width(8.dp))
 
-        for (set in state.endedSets) {
+        /*for (set in state.endedSets) {
             ScoreColumn(set.player1Score.toString(), set.player2Score.toString())
             Spacer(modifier = Modifier.width(8.dp))
-        }
+        }*/
 
         if (state.showCurrentSetScore) {
             ScoreColumn(state.player1SetScore.toString(), state.player2SetScore.toString())

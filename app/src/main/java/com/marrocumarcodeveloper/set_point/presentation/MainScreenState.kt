@@ -1,10 +1,7 @@
 package com.marrocumarcodeveloper.set_point.presentation
 
-import com.marrocumarcodeveloper.set_point.business_logic.EndedSet
-
 data class MainScreenState(
     val player1Serves: Boolean,
-    val endedSets: ArrayList<EndedSet>,
     val player1GameScoreDescription: String,
     val player2GameScoreDescription: String,
     val winnerDescription: String,
@@ -12,12 +9,13 @@ data class MainScreenState(
     val player2SetScore: Int,
     val showCurrentSetScore: Boolean,
     val showEndedMatchAlert: Boolean,
-    val pointButtonsDisabled: Boolean
+    val showSettingsView: Boolean,
+    val pointButtonsEnabled: Boolean,
+    val undoButtonEnabled: Boolean
 ) {
     companion object {
         val initValue = MainScreenState(
             player1Serves = true,
-            endedSets = ArrayList<EndedSet>(),
             player1GameScoreDescription = "0",
             player2GameScoreDescription = "0",
             winnerDescription = "",
@@ -25,8 +23,9 @@ data class MainScreenState(
             player2SetScore = 0,
             showCurrentSetScore = true,
             showEndedMatchAlert = false,
-            pointButtonsDisabled = false
+            showSettingsView = false,
+            pointButtonsEnabled = true,
+            undoButtonEnabled = false
         )
     }
 }
-

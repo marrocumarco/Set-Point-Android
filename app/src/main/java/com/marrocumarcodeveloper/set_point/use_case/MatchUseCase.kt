@@ -5,6 +5,8 @@ import com.marrocumarcodeveloper.set_point.business_logic.Match
 import java.util.ArrayList
 
 class MatchUseCase(private val match: Match) {
+    val canUndo: Boolean
+        get() = match.canUndo
     val player1GameScoreDescription: String
         get() = match.player1GameScoreDescription
     val player2GameScoreDescription: String
@@ -15,8 +17,8 @@ class MatchUseCase(private val match: Match) {
         get() = match.player1SetScore
     val player2SetScore: Int
         get() = match.player2SetScore
-    val pointsButtonsDisabled: Boolean
-        get() = match.pointButtonsDisabled
+    val matchEnded: Boolean
+        get() = match.matchEnded
     val showEndedMatchAlert: Boolean
         get() = match.showEndedMatchAlert
     val showCurrentSetScore: Boolean
@@ -25,7 +27,6 @@ class MatchUseCase(private val match: Match) {
         get() = match.endedSets
     val player1Serves: Boolean
         get() = match.player1Serves
-
     suspend fun pointWonByPlayerOne() {
         match.pointWonByPlayerOne()
     }
@@ -34,5 +35,8 @@ class MatchUseCase(private val match: Match) {
     }
     suspend fun resetMatch() {
         match.resetMatch()
+    }
+    suspend fun undo() {
+        match.undo()
     }
 }

@@ -24,11 +24,12 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
         _mainScreenState.value = newState
     }
 
+    private var showSettingsView = false
+
     private fun updateState() {
         updateState(
             currentState().copy(
                 player1Serves = matchUseCase.player1Serves,
-                endedSets = matchUseCase.endedSets,
                 player1GameScoreDescription = matchUseCase.player1GameScoreDescription,
                 player2GameScoreDescription = matchUseCase.player2GameScoreDescription,
                 winnerDescription = matchUseCase.winnerDescription,
@@ -36,7 +37,9 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 player2SetScore = matchUseCase.player2SetScore,
                 showCurrentSetScore = matchUseCase.showCurrentSetScore,
                 showEndedMatchAlert = matchUseCase.showEndedMatchAlert,
-                pointButtonsDisabled = matchUseCase.pointsButtonsDisabled
+                showSettingsView = showSettingsView,
+                pointButtonsEnabled = !matchUseCase.matchEnded,
+                undoButtonEnabled = matchUseCase.canUndo
             )
         )
     }
@@ -47,7 +50,8 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
             when (event) {
                 is OnClickPLayerOneScoredEvent -> onClickPlayerOneScoredEvent()
                 is OnClickPLayerTwoScoredEvent -> onClickPlayerTwoScoredEvent()
-                is OnClickResetScoreEvent -> onClickResetScoreEvent()
+                is OnClickUndoEvent -> onClickUndoEvent()
+                is OnClickSettingsEvent -> onClickSettingsEvent()
             }
         }
     }
@@ -63,8 +67,12 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
         updateState()
     }
 
-    private suspend fun onClickResetScoreEvent() {
-        matchUseCase.resetMatch()
+    private suspend fun onClickUndoEvent() {
+        matchUseCase.undo()
+        updateState()
+    }
+
+    private suspend fun onClickSettingsEvent() {
         updateState()
     }
 }
