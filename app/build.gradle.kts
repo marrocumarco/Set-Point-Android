@@ -77,9 +77,16 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.51.1")
     implementation("androidx.compose.animation:animation:1.7.5")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    testImplementation(kotlin("test"))
+    testImplementation("org.mockito:mockito-core:5.5.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
 // Allow references to generated code
 kapt {
     correctErrorTypes = true
 }
+
