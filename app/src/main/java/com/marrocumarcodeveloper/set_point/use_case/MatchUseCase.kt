@@ -7,16 +7,20 @@ import java.util.ArrayList
 class MatchUseCase(private val match: Match) {
     val canUndo: Boolean
         get() = match.canUndo
-    val player1GameScoreDescription: String
-        get() = match.player1GameScoreDescription
-    val player2GameScoreDescription: String
-        get() = match.player2GameScoreDescription
+    val player1PointsDescription: String
+        get() = match.player1PointsDescription
+    val player2PointsDescription: String
+        get() = match.player2PointsDescription
+    val player1NumberOfSets: Int
+        get() = match.player1NumberOfSets
+    val player2NumberOfSets: Int
+        get() = match.player2NumberOfSets
+    val player1NumberOfGames: Int
+        get() = match.player1NumberOfGames
+    val player2NumberOfGames: Int
+        get() = match.player2NumberOfGames
     val winnerDescription: String
         get() = match.winnerDescription
-    val player1SetScore: Int
-        get() = match.player1SetScore
-    val player2SetScore: Int
-        get() = match.player2SetScore
     val matchEnded: Boolean
         get() = match.matchEnded
     val showEndedMatchAlert: Boolean

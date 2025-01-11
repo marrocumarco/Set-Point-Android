@@ -272,13 +272,13 @@ private fun GameScoreRow(
 ) {
     Row(horizontalArrangement = Arrangement.SpaceBetween) {
         PlayerScoreButton(
-            state.player1GameScoreDescription, enabled = state.pointButtonsEnabled
+            state.player1PointsDescription, enabled = state.pointButtonsEnabled
         ) {
             onIncrementPlayer1()
         }
         Spacer(modifier = Modifier.width(8.dp))
         PlayerScoreButton(
-            state.player2GameScoreDescription, enabled = state.pointButtonsEnabled
+            state.player2PointsDescription, enabled = state.pointButtonsEnabled
         ) {
             onIncrementPlayer2()
         }
@@ -333,7 +333,7 @@ fun SetsScoreRow(player1Name: String, player2Name: String, state: MainScreenStat
         }*/
 
         if (state.showCurrentSetScore) {
-            ScoreColumn(state.player1SetScore.toString(), state.player2SetScore.toString())
+            ScoreColumn(state.player1NumberOfSets.toString(), state.player2NumberOfSets.toString())
         }
     }
 }

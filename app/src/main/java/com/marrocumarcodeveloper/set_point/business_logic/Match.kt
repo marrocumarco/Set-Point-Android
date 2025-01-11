@@ -10,11 +10,13 @@ interface Match {
     suspend fun undo()
 
     val canUndo: Boolean
-    val player2GameScoreDescription: String
-    val player1GameScoreDescription: String
+    val player1PointsDescription: String
+    val player2PointsDescription: String
+    val player1NumberOfGames: Int
+    val player2NumberOfGames: Int
+    val player1NumberOfSets: Int
+    val player2NumberOfSets: Int
     val winnerDescription: String
-    val player1SetScore: Int
-    val player2SetScore: Int
     val matchEnded: Boolean
     val showEndedMatchAlert: Boolean
     val showCurrentSetScore: Boolean

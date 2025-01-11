@@ -18,19 +18,22 @@ class MatchImpl(val settings: Settings) : Match {
         private set
     override var matchEnded = false
         private set
-    override var player1GameScoreDescription = Point.ZERO.name
+    override var player1PointsDescription = Point.ZERO.name
         private set
-    override var player2GameScoreDescription = Point.ZERO.name
+    override var player2PointsDescription = Point.ZERO.name
         private set
-
+    override val player1NumberOfGames: Int
+        get() = playerScore1.games
+    override val player2NumberOfGames: Int
+        get() = playerScore2.games
+    override val player1NumberOfSets: Int
+        get() = playerScore1.sets
+    override val player2NumberOfSets: Int
+        get() = playerScore2.sets
     private var isTiebreak = false
     private var winner: PlayerScore? = null
     override val winnerDescription: String
         get() = winner?.name ?: ""
-    override val player1SetScore: Int
-        get() = playerScore1.games
-    override val player2SetScore: Int
-        get() = playerScore2.games
     private val isTiebreakEnabled: Boolean
         get() {
             return settings.getTiebreakEnabled()
@@ -66,8 +69,8 @@ class MatchImpl(val settings: Settings) : Match {
         showCurrentSetScore = state.showCurrentSetScore
         showEndedMatchAlert = state.showEndedMatchAlert
         matchEnded = state.matchEnded
-        player1GameScoreDescription = state.player1GameScoreDescription
-        player2GameScoreDescription = state.player2GameScoreDescription
+        player1PointsDescription = state.player1GameScoreDescription
+        player2PointsDescription = state.player2GameScoreDescription
         isTiebreak = state.isTiebreak
         winner = state.winner
     }
@@ -246,8 +249,8 @@ class MatchImpl(val settings: Settings) : Match {
         showCurrentSetScore,
         showEndedMatchAlert,
         matchEnded,
-        player1GameScoreDescription,
-        player2GameScoreDescription,
+        player1PointsDescription,
+        player2PointsDescription,
         isTiebreak,
         winner,
         player1Serves
@@ -286,8 +289,8 @@ class MatchImpl(val settings: Settings) : Match {
     }
 
     private fun updateScoreDescriptions() {
-        player1GameScoreDescription = calculatePointDescription(playerScore1)
-        player2GameScoreDescription = calculatePointDescription(playerScore2)
+        player1PointsDescription = calculatePointDescription(playerScore1)
+        player2PointsDescription = calculatePointDescription(playerScore2)
     }
 
     private fun resetStatesStack() {

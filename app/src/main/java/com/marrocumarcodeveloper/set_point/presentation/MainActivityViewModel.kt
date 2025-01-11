@@ -30,11 +30,13 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
         updateState(
             currentState().copy(
                 player1Serves = matchUseCase.player1Serves,
-                player1GameScoreDescription = matchUseCase.player1GameScoreDescription,
-                player2GameScoreDescription = matchUseCase.player2GameScoreDescription,
+                player1PointsDescription = matchUseCase.player1PointsDescription,
+                player2PointsDescription = matchUseCase.player2PointsDescription,
                 winnerDescription = matchUseCase.winnerDescription,
-                player1SetScore = matchUseCase.player1SetScore,
-                player2SetScore = matchUseCase.player2SetScore,
+                player1NumberOfGames = matchUseCase.player1NumberOfGames,
+                player2NumberOfGames = matchUseCase.player2NumberOfGames,
+                player1NumberOfSets = matchUseCase.player1NumberOfSets,
+                player2NumberOfSets = matchUseCase.player2NumberOfSets,
                 showCurrentSetScore = matchUseCase.showCurrentSetScore,
                 showEndedMatchAlert = matchUseCase.showEndedMatchAlert,
                 showSettingsView = showSettingsView,
