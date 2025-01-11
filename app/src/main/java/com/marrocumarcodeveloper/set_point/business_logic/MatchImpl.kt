@@ -1,5 +1,6 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
+import java.util.EmptyStackException
 import java.util.Stack
 
 class MatchImpl(val settings: Settings) : Match {
@@ -54,10 +55,13 @@ class MatchImpl(val settings: Settings) : Match {
     }
 
     override suspend fun undo() {
-        getPreviousState()?.let {
-            apply(it)
+        try {
+            getPreviousState()?.let {
+                apply(it)
+            }
+        } catch (e: EmptyStackException) {
+            throw IllegalStateException("No previous state")
         }
-        //TODO throw Exception
     }
 
     private fun apply(state: MatchState) {

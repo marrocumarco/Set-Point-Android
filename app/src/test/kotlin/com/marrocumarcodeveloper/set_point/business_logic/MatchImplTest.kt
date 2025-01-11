@@ -50,12 +50,30 @@ class MatchImplTest {
     }
 
     @Test
+    fun pointWonByPlayerOne_shouldIncrementPlayer1Points_tiebreakMode() {
+        runBlocking {
+            goToTiebreak()
+            match.pointWonByPlayerOne()
+            assertEquals("1", match.player1PointsDescription)
+        }
+    }
+
+    @Test
     fun undo_shouldDecrementPoints() {
         runBlocking {
             match.pointWonByPlayerOne()
             match.pointWonByPlayerOne()
             match.undo()
             assertEquals("15", match.player1PointsDescription)
+        }
+    }
+
+    @Test
+    fun undo_shouldThrowExceptionIfNoPreviousState() {
+        assertThrows(IllegalStateException::class.java) {
+            runBlocking {
+                match.undo()
+            }
         }
     }
 
@@ -91,26 +109,20 @@ class MatchImplTest {
         }
     }
 
-//    @Test
-//    fun tiebreak_shouldEnableTiebreakMode() {
-//        runBlocking {
-//            repeat(6) { match.pointWonByPlayerOne() }
-//            repeat(6) { match.pointWonByPlayerTwo() }
-//            match.pointWonByPlayerOne()
-//            assertTrue(match.tie)
-//        }
-//    }
-
     @Test
     fun tiebreakWin_shouldEndSet() {
         runBlocking {
-            repeat(4 * 5) { match.pointWonByPlayerOne() }
-            repeat(4 * 5) { match.pointWonByPlayerTwo() }
-            match.pointWonByPlayerOne()
-            match.pointWonByPlayerTwo()
+            goToTiebreak()
             repeat(7) { match.pointWonByPlayerOne() }
             assertEquals(1, match.player1NumberOfSets)
         }
+    }
+
+    private suspend fun goToTiebreak() {
+        repeat(4 * 5) { match.pointWonByPlayerOne() }
+        repeat(4 * 5) { match.pointWonByPlayerTwo() }
+        repeat(4) { match.pointWonByPlayerOne() }
+        repeat(4) { match.pointWonByPlayerTwo() }
     }
 
     @Test
