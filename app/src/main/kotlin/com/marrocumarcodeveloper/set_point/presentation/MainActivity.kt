@@ -16,14 +16,15 @@ import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -48,9 +49,10 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.dialog.Confirmation
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
@@ -63,7 +65,6 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
-import com.google.android.horologist.compose.layout.fillMaxRectangle
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
 import com.marrocumarcodeveloper.set_point.R
@@ -157,7 +158,13 @@ private fun SecondScreenTest(settingsViewModel: SettingsViewModel) {
             val numberOfSets = state.value.selectedNumberOfSets
             Text(text = "Number of sets: $numberOfSets")
             Button(onClick = { settingsViewModel.onTiebreakEnabledStateChanged(!state.value.tiebreakEnabled) }) {
-                Text(text = if (state.value.tiebreakEnabled) { "tiebreak enabled" } else { "tiebreak disabled"})
+                Text(
+                    text = if (state.value.tiebreakEnabled) {
+                        "tiebreak enabled"
+                    } else {
+                        "tiebreak disabled"
+                    }
+                )
             }
         }
     }
@@ -210,9 +217,16 @@ private fun MatchScoreBoard(
     onResetScore: () -> Unit,
     onShowSettings: () -> Unit
 ) {
+    val configuration = LocalConfiguration.current
+    val isRound = configuration.isScreenRound
+
     ScreenScaffold {
         ScalingLazyColumn(
-            modifier = Modifier.fillMaxRectangle(),
+            modifier = Modifier.fillMaxSize()
+                .padding(
+                    horizontal = if (isRound) 0.1f * configuration.screenWidthDp.dp else 0.dp,
+                    vertical = if (isRound) 0.1f * configuration.screenHeightDp.dp else 0.dp
+                ),
             columnState = columnState
         ) {
             item {
@@ -221,10 +235,10 @@ private fun MatchScoreBoard(
                 )
             }
             item {
-                GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2)
+                GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2, onResetScore)
             }
             item {
-                ResetAndSettingsRow(state, onResetScore, onShowSettings)
+                ResetAndSettingsRow(state, onShowSettings)
             }
         }
     }
@@ -267,19 +281,46 @@ private fun GameOverConfirmation(winnerDescription: String, onUndo: () -> Unit) 
 private fun GameScoreRow(
     state: MainScreenState,
     onIncrementPlayer1: () -> Unit,
-    onIncrementPlayer2: () -> Unit
+    onIncrementPlayer2: () -> Unit,
+    onResetScore: () -> Unit
 ) {
-    Row(horizontalArrangement = Arrangement.SpaceBetween) {
-        PlayerScoreButton(
-            state.player1PointsDescription, enabled = state.pointButtonsEnabled
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f),
+            contentAlignment = Alignment.Center
         ) {
-            onIncrementPlayer1()
+            PlayerScoreButton(
+                state.player1PointsDescription, enabled = state.pointButtonsEnabled
+            ) {
+                onIncrementPlayer1()
+            }
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        PlayerScoreButton(
-            state.player2PointsDescription, enabled = state.pointButtonsEnabled
+        Spacer(modifier = Modifier.size(8.dp)) // Add space between buttons
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f),
+            contentAlignment = Alignment.Center
         ) {
-            onIncrementPlayer2()
+            UndoButton(state.undoButtonEnabled, onResetScore)
+        }
+        Spacer(modifier = Modifier.size(8.dp)) // Add space between button
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .aspectRatio(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            PlayerScoreButton(
+                state.player2PointsDescription, enabled = state.pointButtonsEnabled
+            ) {
+                onIncrementPlayer2()
+            }
         }
     }
 }
@@ -287,7 +328,6 @@ private fun GameScoreRow(
 @Composable
 private fun ResetAndSettingsRow(
     state: MainScreenState,
-    onResetScore: () -> Unit,
     onShowSettings: () -> Unit
 ) {
     Row {
@@ -299,7 +339,6 @@ private fun ResetAndSettingsRow(
                 contentDescription = ""
             )
         }
-        UndoButton(state.undoButtonEnabled, onResetScore)
     }
 }
 
@@ -307,7 +346,8 @@ private fun ResetAndSettingsRow(
 private fun UndoButton(enabled: Boolean, onUndo: () -> Unit) {
     CompactButton(
         onClick = { onUndo() },
-        enabled = enabled
+        enabled = enabled,
+        colors = androidx.wear.compose.material.ButtonDefaults.secondaryButtonColors()
     ) {
         Icon(
             Icons.AutoMirrored.Rounded.Undo,
@@ -320,17 +360,25 @@ private fun UndoButton(enabled: Boolean, onUndo: () -> Unit) {
 fun SetsScoreColumn(player1Name: String, player2Name: String, state: MainScreenState) {
     Column {
         ThreeLabelsRow(player1Name, "", player2Name)
-        ThreeLabelsRow(state.player1NumberOfGames.toString(), "games", state.player2NumberOfGames.toString())
-        ThreeLabelsRow(state.player1NumberOfSets.toString(), "sets", state.player2NumberOfSets.toString())
+        ThreeLabelsRow(
+            state.player1NumberOfGames.toString(),
+            "games",
+            state.player2NumberOfGames.toString()
+        )
+        ThreeLabelsRow(
+            state.player1NumberOfSets.toString(),
+            "sets",
+            state.player2NumberOfSets.toString()
+        )
     }
 }
 
 @Composable
 private fun ThreeLabelsRow(firstText: String, secondText: String, thirdText: String) {
-    Row (
+    Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth()
-    ){
+    ) {
         Text(text = firstText)
         Text(text = secondText)
         Text(text = thirdText)
@@ -339,16 +387,16 @@ private fun ThreeLabelsRow(firstText: String, secondText: String, thirdText: Str
 
 @Composable
 fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
-    Chip(modifier = Modifier
-        .wrapContentSize(Alignment.Center),
-        label = {
-            Text(
-                text = playerScore, style = MaterialTheme.typography.bodySmall, fontSize = 17.sp,
-                textAlign = TextAlign.Center
-            )
-        }, onClick = { onIncrement() },
+    Button(onClick = { onIncrement() },
         enabled = enabled,
-        shape = MaterialTheme.shapes.small)
+        colors = androidx.wear.compose.material.ButtonDefaults.primaryButtonColors()
+    ) {
+        Text(
+            text = playerScore, style = MaterialTheme.typography.bodySmall, fontSize = 17.sp,
+            textAlign = TextAlign.Center
+        )
+
+    }
 }
 
 @Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
