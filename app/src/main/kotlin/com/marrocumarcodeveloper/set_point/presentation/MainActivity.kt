@@ -216,7 +216,7 @@ private fun MatchScoreBoard(
             columnState = columnState
         ) {
             item {
-                SetsScoreRow(
+                SetsScoreColumn(
                     player1Name = player1Name, player2Name = player2Name, state = state
                 )
             }
@@ -317,31 +317,23 @@ private fun UndoButton(enabled: Boolean, onUndo: () -> Unit) {
 }
 
 @Composable
-fun SetsScoreRow(player1Name: String, player2Name: String, state: MainScreenState) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.CenterStart)
-    ) {
-        ScoreColumn(player1Name, player2Name)
-        Spacer(modifier = Modifier.width(8.dp))
-
-        /*for (set in state.endedSets) {
-            ScoreColumn(set.player1Score.toString(), set.player2Score.toString())
-            Spacer(modifier = Modifier.width(8.dp))
-        }*/
-
-        if (state.showCurrentSetScore) {
-            ScoreColumn(state.player1NumberOfSets.toString(), state.player2NumberOfSets.toString())
-        }
+fun SetsScoreColumn(player1Name: String, player2Name: String, state: MainScreenState) {
+    Column {
+        ThreeLabelsRow(player1Name, "", player2Name)
+        ThreeLabelsRow(state.player1NumberOfGames.toString(), "games", state.player2NumberOfGames.toString())
+        ThreeLabelsRow(state.player1NumberOfSets.toString(), "sets", state.player2NumberOfSets.toString())
     }
 }
 
 @Composable
-private fun ScoreColumn(player1Name: String, player2Name: String) {
-    Column {
-        Text(text = player1Name)
-        Text(text = player2Name)
+private fun ThreeLabelsRow(firstText: String, secondText: String, thirdText: String) {
+    Row (
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ){
+        Text(text = firstText)
+        Text(text = secondText)
+        Text(text = thirdText)
     }
 }
 
@@ -356,9 +348,8 @@ fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> 
             )
         }, onClick = { onIncrement() },
         enabled = enabled,
-        shape = MaterialTheme.shapes.large)
+        shape = MaterialTheme.shapes.small)
 }
-
 
 @Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
 @Composable
