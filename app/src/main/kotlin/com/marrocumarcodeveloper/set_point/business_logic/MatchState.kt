@@ -8,8 +8,6 @@ data class MatchState(
     val player2Games: Int,
     val player2Sets: Int,
     val endedSets: ArrayList<EndedSet>,
-    val showCurrentSetScore: Boolean,
-    val showEndedMatchAlert: Boolean,
     val matchEnded: Boolean,
     val player1GameScoreDescription: String,
     val player2GameScoreDescription: String,

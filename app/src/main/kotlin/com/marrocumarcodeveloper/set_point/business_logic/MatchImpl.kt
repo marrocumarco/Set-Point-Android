@@ -13,10 +13,6 @@ class MatchImpl(val settings: Settings) : Match {
         private set
     override var endedSets = ArrayList<EndedSet>()
         private set
-    override var showCurrentSetScore = true
-        private set
-    override var showEndedMatchAlert = false
-        private set
     override var matchEnded = false
         private set
     override var player1PointsDescription = Point.ZERO.name
@@ -70,8 +66,6 @@ class MatchImpl(val settings: Settings) : Match {
         player1Serves = state.player1Serves
         endedSets.clear()
         endedSets.addAll(state.endedSets)
-        showCurrentSetScore = state.showCurrentSetScore
-        showEndedMatchAlert = state.showEndedMatchAlert
         matchEnded = state.matchEnded
         player1PointsDescription = state.player1GameScoreDescription
         player2PointsDescription = state.player2GameScoreDescription
@@ -231,8 +225,6 @@ class MatchImpl(val settings: Settings) : Match {
     private fun checkMatchWin(playerScore: PlayerScore) {
         if (playerScore.sets == numberOfSetsNeededToWin) {
             winner = playerScore
-            showCurrentSetScore = false
-            showEndedMatchAlert = true
             matchEnded = true
         }
     }
@@ -250,8 +242,6 @@ class MatchImpl(val settings: Settings) : Match {
         playerScore2.games,
         playerScore2.sets,
         endedSets,
-        showCurrentSetScore,
-        showEndedMatchAlert,
         matchEnded,
         player1PointsDescription,
         player2PointsDescription,
@@ -275,8 +265,6 @@ class MatchImpl(val settings: Settings) : Match {
 
     private fun resetFlags() {
         isTiebreak = false
-        showCurrentSetScore = true
-        showEndedMatchAlert = false
         matchEnded = false
         player1Serves = true
     }

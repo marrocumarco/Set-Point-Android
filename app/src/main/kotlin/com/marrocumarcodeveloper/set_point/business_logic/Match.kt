@@ -18,8 +18,6 @@ interface Match {
     val player2NumberOfSets: Int
     val winnerDescription: String
     val matchEnded: Boolean
-    val showEndedMatchAlert: Boolean
-    val showCurrentSetScore: Boolean
     val endedSets: ArrayList<EndedSet>
     val player1Serves: Boolean
 }

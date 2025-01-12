@@ -37,10 +37,10 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 player2NumberOfGames = matchUseCase.player2NumberOfGames,
                 player1NumberOfSets = matchUseCase.player1NumberOfSets,
                 player2NumberOfSets = matchUseCase.player2NumberOfSets,
-                showCurrentSetScore = matchUseCase.showCurrentSetScore,
-                showEndedMatchAlert = matchUseCase.showEndedMatchAlert,
+                showCurrentSetScore = matchUseCase.matchEnded.not(),
+                showEndedMatchAlert = matchUseCase.matchEnded,
                 showSettingsView = showSettingsView,
-                pointButtonsEnabled = !matchUseCase.matchEnded,
+                pointButtonsEnabled = matchUseCase.matchEnded.not(),
                 undoButtonEnabled = matchUseCase.canUndo
             )
         )

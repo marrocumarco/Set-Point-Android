@@ -26,8 +26,6 @@ class MatchImplTest {
             assertEquals(0, match.player1NumberOfSets)
             assertEquals(0, match.player2NumberOfSets)
             assertEquals(0, match.endedSets.size)
-            assertTrue(match.showCurrentSetScore)
-            assertFalse(match.showEndedMatchAlert)
             assertFalse(match.matchEnded)
             assertTrue(match.player1Serves)
         }
@@ -105,7 +103,6 @@ class MatchImplTest {
         runBlocking {
             repeat(24 * 2) { match.pointWonByPlayerOne() }
             assertTrue(match.matchEnded)
-            assertTrue(match.showEndedMatchAlert)
         }
     }
 
@@ -201,21 +198,6 @@ class MatchImplTest {
         runBlocking {
             repeat(24 * 2) { match.pointWonByPlayerOne() }
             assertTrue(match.matchEnded)
-        }
-    }
-
-    @Test
-    fun showEndedMatchAlert_shouldReturnCorrectValue() {
-        runBlocking {
-            repeat(24 * 2) { match.pointWonByPlayerOne() }
-            assertTrue(match.showEndedMatchAlert)
-        }
-    }
-
-    @Test
-    fun showCurrentSetScore_shouldReturnCorrectValue() {
-        runBlocking {
-            assertTrue(match.showCurrentSetScore)
         }
     }
 

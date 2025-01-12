@@ -74,18 +74,6 @@ class MatchUseCaseTest {
     }
 
     @Test
-    fun getShowEndedMatchAlert() {
-        `when`(match.showEndedMatchAlert).thenReturn(true)
-        assertTrue(matchUseCase.showEndedMatchAlert)
-    }
-
-    @Test
-    fun getShowCurrentSetScore() {
-        `when`(match.showCurrentSetScore).thenReturn(true)
-        assertTrue(matchUseCase.showCurrentSetScore)
-    }
-
-    @Test
     fun getEndedSets() {
         val endedSets = arrayListOf(EndedSet(1, 6))
         `when`(match.endedSets).thenReturn(endedSets)

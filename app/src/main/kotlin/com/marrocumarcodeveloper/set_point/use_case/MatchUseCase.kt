@@ -23,10 +23,6 @@ class MatchUseCase(private val match: Match) {
         get() = match.winnerDescription
     val matchEnded: Boolean
         get() = match.matchEnded
-    val showEndedMatchAlert: Boolean
-        get() = match.showEndedMatchAlert
-    val showCurrentSetScore: Boolean
-        get() = match.showCurrentSetScore
     val endedSets: ArrayList<EndedSet>
         get() = match.endedSets
     val player1Serves: Boolean
