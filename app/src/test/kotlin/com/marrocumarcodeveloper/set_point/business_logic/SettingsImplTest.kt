@@ -1,5 +1,6 @@
+package com.marrocumarcodeveloper.set_point.business_logic
+
 import android.content.SharedPreferences
-import com.marrocumarcodeveloper.set_point.business_logic.SettingsImpl
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,7 +27,7 @@ class SettingsImplTest {
         settings.setSelectedNumberOfSets(5)
 
         verify(editor).putInt(SettingsImpl.NUMBER_OF_SETS, 5)
-        verify(editor).commit()
+        verify(editor).apply()
     }
 
     @Test
@@ -55,7 +56,7 @@ class SettingsImplTest {
         settings.setTiebreakEnabled(true)
 
         verify(editor).putBoolean(SettingsImpl.TIEBREAK_ENABLED, true)
-        verify(editor).commit()
+        verify(editor).apply()
     }
 
     @Test

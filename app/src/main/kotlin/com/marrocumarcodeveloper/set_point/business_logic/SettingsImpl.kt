@@ -2,7 +2,7 @@ package com.marrocumarcodeveloper.set_point.business_logic
 
 import android.content.SharedPreferences
 
-class SettingsImpl(val sharedPref: SharedPreferences) : Settings {
+class SettingsImpl(private val sharedPref: SharedPreferences) : Settings {
 
     private val numberOfSets = intArrayOf(1,3,5)
     //private var selectedNumberOfSets: Int = defaultNumberOfSets
@@ -12,7 +12,7 @@ class SettingsImpl(val sharedPref: SharedPreferences) : Settings {
         //selectedNumberOfSets = numberOfSets
         sharedPref.edit().apply {
             putInt(NUMBER_OF_SETS, numberOfSets)
-            commit()
+            apply()
         }
     }
 
@@ -28,7 +28,7 @@ class SettingsImpl(val sharedPref: SharedPreferences) : Settings {
         sharedPref.edit().apply {
             putBoolean(
                 TIEBREAK_ENABLED, enabled)
-            commit()
+            apply()
         }
     }
 

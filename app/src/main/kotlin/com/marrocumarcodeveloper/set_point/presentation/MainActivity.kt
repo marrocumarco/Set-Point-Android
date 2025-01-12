@@ -33,7 +33,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,6 +56,7 @@ import androidx.wear.compose.material.dialog.Confirmation
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import androidx.wear.tooling.preview.devices.WearDevices
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.AppScaffold
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -94,7 +94,6 @@ fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewMod
         onShowSettings = { viewModel.onEvent(OnClickSettingsEvent) })
 }
 
-@OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun NavigationScreen(
     viewModel: MainActivityViewModel,
@@ -109,7 +108,7 @@ fun NavigationScreen(
     val state by viewModel.mainScreenState.collectAsState()
 
     AppScaffold(timeText = {
-        TimeText() // Mostra l'ora in alto
+        TimeText() // Show hour on top
     }) {
         val navController = rememberSwipeDismissableNavController()
         SwipeDismissableNavHost(
@@ -164,7 +163,7 @@ private fun SecondScreenTest(settingsViewModel: SettingsViewModel) {
     }
 }
 
-@OptIn(ExperimentalHorologistApi::class, ExperimentalAnimationGraphicsApi::class)
+@OptIn(ExperimentalHorologistApi::class)
 @Composable
 private fun TennisMatchScreen(
     player1Name: String,
@@ -361,8 +360,8 @@ fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> 
 }
 
 
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    PlayerScoreButton("1", true, {})
+    PlayerScoreButton("1", true) {}
 }

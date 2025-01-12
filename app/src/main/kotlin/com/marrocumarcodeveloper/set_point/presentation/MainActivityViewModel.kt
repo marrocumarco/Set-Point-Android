@@ -75,6 +75,6 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
     }
 
     private suspend fun onClickSettingsEvent() {
-        updateState()
+        //TODO: implement settings view
     }
 }

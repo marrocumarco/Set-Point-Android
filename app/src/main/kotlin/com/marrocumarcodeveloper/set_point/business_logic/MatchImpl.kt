@@ -312,7 +312,7 @@ class MatchImpl(val settings: Settings) : Match {
                 Point.THIRTY.value -> pointsDescription = "30"
                 Point.FORTY.value -> pointsDescription = "40"
                 Point.ADVANTAGE.value -> pointsDescription = "A"
-                Point.GAMEWON.value -> pointsDescription = "W"
+                Point.GAME_WON.value -> pointsDescription = "W"
             }
         }
         return pointsDescription

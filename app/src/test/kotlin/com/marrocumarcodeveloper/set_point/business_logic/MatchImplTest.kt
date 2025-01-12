@@ -1,5 +1,5 @@
-import com.marrocumarcodeveloper.set_point.business_logic.MatchImpl
-import com.marrocumarcodeveloper.set_point.business_logic.Settings
+package com.marrocumarcodeveloper.set_point.business_logic
+
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
