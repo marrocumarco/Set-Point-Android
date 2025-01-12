@@ -24,8 +24,6 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
         _mainScreenState.value = newState
     }
 
-    private var showSettingsView = false
-
     private fun updateState() {
         updateState(
             currentState().copy(
@@ -39,7 +37,7 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 player2NumberOfSets = matchUseCase.player2NumberOfSets,
                 showCurrentSetScore = matchUseCase.matchEnded.not(),
                 showEndedMatchAlert = matchUseCase.matchEnded,
-                showSettingsView = showSettingsView,
+                showSettingsView = false,
                 pointButtonsEnabled = matchUseCase.matchEnded.not(),
                 undoButtonEnabled = matchUseCase.canUndo
             )
@@ -74,7 +72,7 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
         updateState()
     }
 
-    private suspend fun onClickSettingsEvent() {
-        //TODO: implement settings view
+    private fun onClickSettingsEvent() {
+        updateState(currentState().copy(showSettingsView = true))
     }
 }
