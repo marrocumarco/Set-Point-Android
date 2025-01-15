@@ -11,7 +11,6 @@ data class MainScreenState(
     val winnerDescription: String,
     val showCurrentSetScore: Boolean,
     val showEndedMatchAlert: Boolean,
-    val showSettingsView: Boolean,
     val pointButtonsEnabled: Boolean,
     val undoButtonEnabled: Boolean
 ) {
@@ -27,7 +26,6 @@ data class MainScreenState(
             winnerDescription = "",
             showCurrentSetScore = true,
             showEndedMatchAlert = false,
-            showSettingsView = false,
             pointButtonsEnabled = true,
             undoButtonEnabled = false
         )

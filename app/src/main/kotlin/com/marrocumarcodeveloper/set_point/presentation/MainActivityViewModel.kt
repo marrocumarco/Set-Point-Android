@@ -16,6 +16,9 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
     private val _mainScreenState = MutableStateFlow(MainScreenState.initValue)
     val mainScreenState: StateFlow<MainScreenState> = _mainScreenState.asStateFlow()
 
+    private val _navigationEvent = MutableStateFlow<MainViewEvent?>(null)
+    val navigationEvent: StateFlow<MainViewEvent?> = _navigationEvent.asStateFlow()
+
     // Function to get the current state
     private fun currentState(): MainScreenState = _mainScreenState.value
 
@@ -37,7 +40,6 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 player2NumberOfSets = matchUseCase.player2NumberOfSets,
                 showCurrentSetScore = matchUseCase.matchEnded.not(),
                 showEndedMatchAlert = matchUseCase.matchEnded,
-                showSettingsView = false,
                 pointButtonsEnabled = matchUseCase.matchEnded.not(),
                 undoButtonEnabled = matchUseCase.canUndo
             )
@@ -52,6 +54,7 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 is OnClickPLayerTwoScoredEvent -> onClickPlayerTwoScoredEvent()
                 is OnClickUndoEvent -> onClickUndoEvent()
                 is OnClickSettingsEvent -> onClickSettingsEvent()
+                is OnSettingsShownEvent -> onSettingsShown()
             }
         }
     }
@@ -73,6 +76,10 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
     }
 
     private fun onClickSettingsEvent() {
-        updateState(currentState().copy(showSettingsView = true))
+        _navigationEvent.value = OnClickSettingsEvent
+    }
+
+    private fun onSettingsShown() {
+        _navigationEvent.value = null
     }
 }

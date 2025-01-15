@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.material.CompactButton
@@ -92,7 +91,8 @@ fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewMod
         onIncrementPlayer1 = { viewModel.onEvent(OnClickPLayerOneScoredEvent) },
         onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) },
         onUndo = { viewModel.onEvent(OnClickUndoEvent) },
-        onShowSettings = { viewModel.onEvent(OnClickSettingsEvent) })
+        onShowSettings = { viewModel.onEvent(OnClickSettingsEvent) },
+        onSettingsShown = { viewModel.onEvent(OnSettingsShownEvent) })
 }
 
 @Composable
@@ -104,14 +104,22 @@ fun NavigationScreen(
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
     onUndo: () -> Unit,
-    onShowSettings: () -> Unit
+    onShowSettings: () -> Unit,
+    onSettingsShown: () -> Unit
 ) {
     val state by viewModel.mainScreenState.collectAsState()
+    val navigationEventState by viewModel.navigationEvent.collectAsState()
+    val navController = rememberSwipeDismissableNavController()
+
+    if (navigationEventState != null && navigationEventState is OnClickSettingsEvent) {
+        navController.navigate("second_screen_test")
+        onSettingsShown()
+    }
 
     AppScaffold(timeText = {
         TimeText() // Show hour on top
     }) {
-        val navController = rememberSwipeDismissableNavController()
+
         SwipeDismissableNavHost(
             navController = navController,
             startDestination = "tennis_match_screen"
@@ -124,8 +132,7 @@ fun NavigationScreen(
                     onIncrementPlayer1,
                     onIncrementPlayer2,
                     onUndo,
-                    onShowSettings,
-                    navController
+                    onShowSettings
                 )
             }
             composable("second_screen_test") {
@@ -180,7 +187,6 @@ private fun TennisMatchScreen(
     onIncrementPlayer2: () -> Unit,
     onUndo: () -> Unit,
     onShowSettings: () -> Unit,
-    navController: NavHostController,
 ) {
     val columnState = rememberColumnState(
         factory = ScalingLazyColumnDefaults.responsive(
@@ -189,8 +195,6 @@ private fun TennisMatchScreen(
     )
     if (state.showEndedMatchAlert) {
         GameOverConfirmation(state.winnerDescription, onUndo)
-    } else if (state.showSettingsView) {
-        navController.navigate("second_screen_test")
     } else {
         MatchScoreBoard(
             columnState,
@@ -222,7 +226,8 @@ private fun MatchScoreBoard(
 
     ScreenScaffold {
         ScalingLazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(
                     horizontal = if (isRound) 0.1f * configuration.screenWidthDp.dp else 0.dp,
                     vertical = if (isRound) 0.1f * configuration.screenHeightDp.dp else 0.dp
@@ -332,7 +337,7 @@ private fun ResetAndSettingsRow(
 ) {
     Row {
         CompactButton(
-            onClick = { onShowSettings },
+            onClick = { onShowSettings() },
         ) {
             Icon(
                 Icons.Rounded.Settings,
@@ -387,7 +392,8 @@ private fun ThreeLabelsRow(firstText: String, secondText: String, thirdText: Str
 
 @Composable
 fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
-    Button(onClick = { onIncrement() },
+    Button(
+        onClick = { onIncrement() },
         enabled = enabled,
         colors = androidx.wear.compose.material.ButtonDefaults.primaryButtonColors()
     ) {
