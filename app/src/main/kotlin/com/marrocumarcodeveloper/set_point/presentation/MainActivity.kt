@@ -1,9 +1,3 @@
-/* While this template provides a good starting point for using Wear Compose, you can always
- * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter and
- * https://github.com/android/wear-os-samples/tree/main/ComposeAdvanced to find the most up to date
- * changes to the libraries and their usages.
- */
-
 package com.marrocumarcodeveloper.set_point.presentation
 
 import android.os.Bundle
@@ -25,8 +19,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -37,8 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
-import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.material.CompactButton
 import androidx.wear.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -65,7 +55,6 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
-import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
 import com.marrocumarcodeveloper.set_point.R
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -136,42 +125,7 @@ fun NavigationScreen(
                 )
             }
             composable("second_screen_test") {
-                SecondScreenTest(settingsViewModel)
-            }
-        }
-    }
-// ...
-// .. Screen level content goes here
-    //val scrollState = rememberScrollState()
-
-    // ScreenScaffold(scrollState = scrollState) {
-    // Screen content goes here
-    //}
-}
-
-@OptIn(ExperimentalHorologistApi::class, ExperimentalWearFoundationApi::class)
-@Composable
-private fun SecondScreenTest(settingsViewModel: SettingsViewModel) {
-    val state = settingsViewModel.settingsScreenState.collectAsState()
-    val scrollState = rememberScrollState()
-    ScreenScaffold(scrollState = scrollState) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .rotaryWithScroll(scrollState, rememberActiveFocusRequester())
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val numberOfSets = state.value.selectedNumberOfSets
-            Text(text = "Number of sets: $numberOfSets")
-            Button(onClick = { settingsViewModel.onTiebreakEnabledStateChanged(!state.value.tiebreakEnabled) }) {
-                Text(
-                    text = if (state.value.tiebreakEnabled) {
-                        "tiebreak enabled"
-                    } else {
-                        "tiebreak disabled"
-                    }
-                )
+                SettingsScreen(settingsViewModel = settingsViewModel)
             }
         }
     }
@@ -335,6 +289,7 @@ private fun ResetAndSettingsRow(
     state: MainScreenState,
     onShowSettings: () -> Unit
 ) {
+    //TODO: Add a reset button
     Row {
         CompactButton(
             onClick = { onShowSettings() },

@@ -31,9 +31,14 @@ class SettingsViewModel @Inject constructor(private var settingsUseCase: Setting
         )
     }
 
-    // Handle the OnClickCountUpEvent
-    fun onTiebreakEnabledStateChanged(enabled: Boolean) {
-        settingsUseCase.setTiebreakEnabled(enabled)
+    fun onEvent(event: SettingsViewEvent) {
+        when (event) {
+            is OnClickTiebreakEvent -> onTiebreakEnabledStateChanged()
+            is OnNumberOfSetsSelectedEvent -> onNumberOfSetsSelected(event.numberOfSets)
+        }
+    }
+    fun onTiebreakEnabledStateChanged() {
+        settingsUseCase.setTiebreakEnabled(currentState().tiebreakEnabled.not())
         updateState()
     }
 

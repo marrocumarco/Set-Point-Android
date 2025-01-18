@@ -4,15 +4,19 @@ import android.content.SharedPreferences
 
 class SettingsImpl(private val sharedPref: SharedPreferences) : Settings {
 
-    private val numberOfSets = intArrayOf(1,3,5)
+    private val selectableNumbersOfSets = intArrayOf(1,3,5)
     //private var selectedNumberOfSets: Int = defaultNumberOfSets
     private var defaultTieBreakEnabled = true
 
     override fun setSelectedNumberOfSets(numberOfSets: Int) {
-        //selectedNumberOfSets = numberOfSets
-        sharedPref.edit().apply {
-            putInt(NUMBER_OF_SETS, numberOfSets)
-            apply()
+
+        if (selectableNumbersOfSets.contains(numberOfSets)) {
+            sharedPref.edit().apply {
+                putInt(NUMBER_OF_SETS, numberOfSets)
+                apply()
+            }
+        } else {
+            throw IllegalArgumentException("Invalid number of sets")
         }
     }
 
@@ -21,7 +25,7 @@ class SettingsImpl(private val sharedPref: SharedPreferences) : Settings {
     }
 
     override fun getNumberOfSets(): IntArray {
-        return numberOfSets
+        return selectableNumbersOfSets
     }
 
     override fun setTiebreakEnabled(enabled: Boolean) {
