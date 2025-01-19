@@ -15,9 +15,9 @@ class MatchImpl(val settings: Settings) : Match {
         private set
     override var matchEnded = false
         private set
-    override var player1PointsDescription = Point.ZERO.name
+    override var player1PointsDescription = Point.ZERO.value.toString()
         private set
-    override var player2PointsDescription = Point.ZERO.name
+    override var player2PointsDescription = Point.ZERO.value.toString()
         private set
     override val player1NumberOfGames: Int
         get() = playerScore1.games
@@ -300,7 +300,6 @@ class MatchImpl(val settings: Settings) : Match {
                 Point.THIRTY.value -> pointsDescription = "30"
                 Point.FORTY.value -> pointsDescription = "40"
                 Point.ADVANTAGE.value -> pointsDescription = "A"
-                Point.GAME_WON.value -> pointsDescription = "W"
             }
         }
         return pointsDescription

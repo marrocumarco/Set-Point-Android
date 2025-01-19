@@ -40,6 +40,27 @@ class MatchImplTest {
     }
 
     @Test
+    fun pointWonByPlayerOne_player1ShouldGoToAdvantage() {
+        runBlocking {
+            //Arrange
+            goToDeuce()
+            //Act
+            match.pointWonByPlayerOne()
+            //Assert
+            assertEquals("A", match.player1PointsDescription)
+        }
+    }
+
+    private suspend fun goToDeuce() {
+        match.pointWonByPlayerOne()
+        match.pointWonByPlayerOne()
+        match.pointWonByPlayerOne()
+        match.pointWonByPlayerTwo()
+        match.pointWonByPlayerTwo()
+        match.pointWonByPlayerTwo()
+    }
+
+    @Test
     fun pointWonByPlayerTwo_shouldIncrementPlayer2Points() {
         runBlocking {
             match.pointWonByPlayerTwo()
@@ -56,13 +77,19 @@ class MatchImplTest {
         }
     }
 
+    private suspend fun goToTiebreak() {
+        repeat(4 * 5) { match.pointWonByPlayerOne() }
+        repeat(4 * 5) { match.pointWonByPlayerTwo() }
+        repeat(4) { match.pointWonByPlayerOne() }
+        repeat(4) { match.pointWonByPlayerTwo() }
+    }
+
     @Test
     fun undo_shouldDecrementPoints() {
         runBlocking {
             match.pointWonByPlayerOne()
-            match.pointWonByPlayerOne()
             match.undo()
-            assertEquals("15", match.player1PointsDescription)
+            assertEquals("0", match.player1PointsDescription)
         }
     }
 
@@ -113,13 +140,6 @@ class MatchImplTest {
             repeat(7) { match.pointWonByPlayerOne() }
             assertEquals(1, match.player1NumberOfSets)
         }
-    }
-
-    private suspend fun goToTiebreak() {
-        repeat(4 * 5) { match.pointWonByPlayerOne() }
-        repeat(4 * 5) { match.pointWonByPlayerTwo() }
-        repeat(4) { match.pointWonByPlayerOne() }
-        repeat(4) { match.pointWonByPlayerTwo() }
     }
 
     @Test
