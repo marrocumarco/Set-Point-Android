@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*
 import kotlin.test.DefaultAsserter.assertEquals
 
@@ -28,6 +29,11 @@ class SettingsImplTest {
 
         verify(editor).putInt(SettingsImpl.NUMBER_OF_SETS, 5)
         verify(editor).apply()
+    }
+
+    @Test
+    fun setSelectedNumberOfSets_invalidNumberOfSets_failure() {
+        assertThrows<IllegalArgumentException> { settings.setSelectedNumberOfSets(0) }
     }
 
     @Test
