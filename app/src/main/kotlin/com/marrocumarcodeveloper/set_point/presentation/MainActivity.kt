@@ -133,7 +133,6 @@ fun NavigationScreen(
     }
 }
 
-@OptIn(ExperimentalHorologistApi::class)
 @Composable
 private fun TennisMatchScreen(
     player1Name: String,
@@ -183,7 +182,7 @@ private fun MatchScoreBoard(
                 .fillMaxSize()
                 .padding(
                     horizontal = if (isRound) 0.1f * configuration.screenWidthDp.dp else 0.dp,
-                    vertical = if (isRound) 0.1f * configuration.screenHeightDp.dp else 0.dp
+                    vertical = 0.dp
                 ),
             columnState = columnState
         ) {
@@ -355,7 +354,6 @@ fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> 
             text = playerScore, style = MaterialTheme.typography.bodySmall, fontSize = 17.sp,
             textAlign = TextAlign.Center
         )
-
     }
 }
 

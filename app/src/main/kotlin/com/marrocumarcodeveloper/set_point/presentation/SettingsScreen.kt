@@ -13,24 +13,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.material3.AlertDialog
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import androidx.compose.ui.window.DialogProperties
-import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.Picker
 import androidx.wear.compose.material.Switch
-import androidx.wear.compose.material.rememberPickerState
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
@@ -39,75 +30,19 @@ import com.google.android.horologist.compose.layout.rememberColumnState
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel) {
     val state = settingsViewModel.settingsScreenState.collectAsState()
-    var openNumberOfSetsDialog by remember { mutableStateOf(false) }
 
-    if (openNumberOfSetsDialog) {
-        NumberOfSetsDialog(
-            values = state.value.numberOfSets,
-            currentValue = state.value.selectedNumberOfSets,
-            onDismiss = { openNumberOfSetsDialog = false },
-            onConfirm = { selectedNumber ->
-                openNumberOfSetsDialog = false
-                settingsViewModel.onEvent(
-                    OnNumberOfSetsSelectedEvent(selectedNumber)
-                )
-                openNumberOfSetsDialog = false
-            }
-        )
-    } else {
-        TileList(
-            state = state.value,
-            onclickNumberOfSetsChip = { openNumberOfSetsDialog = true },
-            onclickTiebreakChip = {
-                settingsViewModel.onEvent(
-                    OnClickTiebreakEvent
-                )
-            })
-    }
-}
-
-@Composable
-fun NumberOfSetsDialog(
-    values: IntArray,
-    currentValue: Int,
-    onDismiss: () -> Unit,
-    onConfirm: (Int) -> Unit
-) {
-    val state = rememberPickerState(
-        initialNumberOfOptions = values.size,
-        initiallySelectedOption = values.indexOf(currentValue),
-        repeatItems = false
-    )
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Select number of Sets") },
-        text = {
-            Picker(
-                state = state, contentDescription = "",
-                modifier = Modifier.fillMaxWidth()
-            ) { itemIndex -> Text(text = values[itemIndex].toString()) }
+    TileList(
+        state = state.value,
+        onclickNumberOfSetsChip = {
+            settingsViewModel.onEvent(
+                OnClickNumberOfSetsSelectedEvent
+            )
         },
-        confirmButton = {
-            Button(
-                onClick = {
-                    onConfirm(values[state.selectedOption])
-                    onDismiss()
-                }
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        },
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        )
-    )
+        onclickTiebreakChip = {
+            settingsViewModel.onEvent(
+                OnClickTiebreakEvent
+            )
+        })
 }
 
 @Composable
@@ -134,7 +69,7 @@ fun TileList(
             Text(
                 text = "Settings",
                 modifier = Modifier.padding(bottom = 16.dp),
-                style = MaterialTheme.typography.title2
+                style = MaterialTheme.typography.title3
             )
         }
         item {
@@ -171,13 +106,13 @@ fun TileList(
 @Composable
 private fun createCustomChip(onClick: () -> Unit, content: @Composable() (RowScope.() -> Unit)) {
     Chip(
+        label = { content() },
         onClick = { onClick() },
         colors = ChipDefaults.primaryChipColors(),
         border = ChipDefaults.chipBorder(),
         modifier = Modifier.fillMaxWidth()
-    ) {
-        content()
-    }
+    )
 }
+
 
 

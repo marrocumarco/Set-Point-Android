@@ -24,9 +24,9 @@ class SettingsViewModel @Inject constructor(private var settingsUseCase: Setting
     private fun updateState() {
         updateState(
             currentState().copy(
-                selectedNumberOfSets = settingsUseCase.getSelectedNumberOfSets(),
+                selectedNumberOfSets = getCurrentNumberOfSets(),
                 tiebreakEnabled = settingsUseCase.getTiebreakEnabled(),
-                numberOfSets = settingsUseCase.getNumberOfSets()
+                numberOfSets = getSelectableNumberOfSets()
             )
         )
     }
@@ -34,7 +34,7 @@ class SettingsViewModel @Inject constructor(private var settingsUseCase: Setting
     fun onEvent(event: SettingsViewEvent) {
         when (event) {
             is OnClickTiebreakEvent -> onTiebreakEnabledStateChanged()
-            is OnNumberOfSetsSelectedEvent -> onNumberOfSetsSelected(event.numberOfSets)
+            is OnClickNumberOfSetsSelectedEvent -> onClickNumberOfSetsSelected()
         }
     }
     fun onTiebreakEnabledStateChanged() {
@@ -42,8 +42,35 @@ class SettingsViewModel @Inject constructor(private var settingsUseCase: Setting
         updateState()
     }
 
-    private fun onNumberOfSetsSelected(numberOfSets: Int) {
-        settingsUseCase.setSelectedNumberOfSets(numberOfSets)
+    private fun onClickNumberOfSetsSelected() {
+        val updatedNumberOfSets = getUpdatedNumberOfSets()
+        updateNumberOfSets(updatedNumberOfSets)
         updateState()
     }
+
+    private fun getUpdatedNumberOfSets(): Int {
+        val selectableNumberOfSets = getSelectableNumberOfSets()
+        val nextIndex = calculateNextSelectableNumberOfSetsIndex(selectableNumberOfSets)
+        return selectableNumberOfSets[nextIndex]
+    }
+
+    private fun getSelectableNumberOfSets() = settingsUseCase.getSelectableNumberOfSets()
+
+    private fun calculateNextSelectableNumberOfSetsIndex(selectableNumberOfSets: IntArray): Int {
+        val currentIndex = getCurrentIndexOf(selectableNumberOfSets)
+        val nextIndex = (currentIndex + 1) % selectableNumberOfSets.size
+        return nextIndex
+    }
+
+    private fun updateNumberOfSets(updatedNumberOfSets: Int) {
+        settingsUseCase.setSelectedNumberOfSets(updatedNumberOfSets)
+    }
+
+    private fun getCurrentIndexOf(selectableNumberOfSets: IntArray): Int {
+        val selectedNumberOfSets = getCurrentNumberOfSets()
+        val index = selectableNumberOfSets.indexOf(selectedNumberOfSets)
+        return index
+    }
+
+    private fun getCurrentNumberOfSets() = settingsUseCase.getSelectedNumberOfSets()
 }

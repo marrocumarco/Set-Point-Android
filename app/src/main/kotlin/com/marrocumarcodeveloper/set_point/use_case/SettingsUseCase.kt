@@ -3,7 +3,7 @@ package com.marrocumarcodeveloper.set_point.use_case
 import com.marrocumarcodeveloper.set_point.business_logic.Settings
 
 class SettingsUseCase(private val settings: Settings) {
-    fun getNumberOfSets(): IntArray {
+    fun getSelectableNumberOfSets(): IntArray {
         return settings.getNumberOfSets()
     }
 
