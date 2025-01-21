@@ -52,10 +52,10 @@ import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.AppScaffold
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
-import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.marrocumarcodeveloper.set_point.R
+import com.marrocumarcodeveloper.set_point.presentation.theme.SetPointTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -67,7 +67,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WearApp(viewModel, settingsViewModel = settingsViewModel)
+            SetPointTheme {
+                WearApp(viewModel, settingsViewModel = settingsViewModel)
+            }
         }
     }
 }
@@ -142,16 +144,10 @@ private fun TennisMatchScreen(
     onUndo: () -> Unit,
     onShowSettings: () -> Unit,
 ) {
-    val columnState = rememberColumnState(
-        factory = ScalingLazyColumnDefaults.responsive(
-            userScrollEnabled = false
-        ),
-    )
     if (state.showEndedMatchAlert) {
         GameOverConfirmation(state.winnerDescription, onUndo)
     } else {
         MatchScoreBoard(
-            columnState,
             player1Name,
             player2Name,
             state,
@@ -166,7 +162,6 @@ private fun TennisMatchScreen(
 @Composable
 @OptIn(ExperimentalHorologistApi::class)
 private fun MatchScoreBoard(
-    columnState: ScalingLazyColumnState,
     player1Name: String,
     player2Name: String,
     state: MainScreenState,
@@ -177,7 +172,11 @@ private fun MatchScoreBoard(
 ) {
     val configuration = LocalConfiguration.current
     val isRound = configuration.isScreenRound
-
+    val columnState = rememberColumnState(
+        factory = ScalingLazyColumnDefaults.responsive(
+            userScrollEnabled = false
+        )
+    )
     ScreenScaffold {
         ScalingLazyColumn(
             modifier = Modifier
