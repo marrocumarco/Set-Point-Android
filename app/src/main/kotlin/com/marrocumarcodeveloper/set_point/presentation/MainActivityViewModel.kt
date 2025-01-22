@@ -19,6 +19,9 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
     private val _navigationEvent = MutableStateFlow<MainViewEvent?>(null)
     val navigationEvent: StateFlow<MainViewEvent?> = _navigationEvent.asStateFlow()
 
+    private val _showConfirmationDialog = MutableStateFlow(false)
+    val showConfirmationDialog: StateFlow<Boolean> = _showConfirmationDialog.asStateFlow()
+
     // Function to get the current state
     private fun currentState(): MainScreenState = _mainScreenState.value
 
@@ -55,8 +58,24 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 is OnClickUndoEvent -> onClickUndoEvent()
                 is OnClickSettingsEvent -> onClickSettingsEvent()
                 is OnSettingsShownEvent -> onSettingsShown()
+                is OnClickResetEvent -> onClickResetEvent()
+                is OnClickConfirmResetEvent -> OnClickConfirmResetEvent()
+                is OnClickCancelResetEvent -> onClickCancelResetEvent()
             }
         }
+    }
+
+    private fun onClickResetEvent() {
+        _showConfirmationDialog.value = true
+    }
+    private fun onClickCancelResetEvent() {
+        _showConfirmationDialog.value = false
+    }
+
+    private suspend fun OnClickConfirmResetEvent() {
+        matchUseCase.resetMatch()
+        _showConfirmationDialog.value = false
+        updateState()
     }
 
     // Handle the OnClickCountUpEvent

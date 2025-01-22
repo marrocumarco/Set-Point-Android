@@ -33,6 +33,7 @@ import androidx.wear.compose.material.CompactButton
 import androidx.wear.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo
+import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.marrocumarcodeveloper.set_point.R
+import com.marrocumarcodeveloper.set_point.presentation.components.confirmationDialog
 import com.marrocumarcodeveloper.set_point.presentation.theme.SetPointTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -67,23 +69,31 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SetPointTheme {
-                WearApp(viewModel, settingsViewModel = settingsViewModel)
-            }
+            WearApp(viewModel, settingsViewModel = settingsViewModel)
         }
     }
 }
 
 @Composable
 fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewModel) {
-
-    NavigationScreen(viewModel = viewModel,
-        settingsViewModel = settingsViewModel,
-        onIncrementPlayer1 = { viewModel.onEvent(OnClickPLayerOneScoredEvent) },
-        onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) },
-        onUndo = { viewModel.onEvent(OnClickUndoEvent) },
-        onShowSettings = { viewModel.onEvent(OnClickSettingsEvent) },
-        onSettingsShown = { viewModel.onEvent(OnSettingsShownEvent) })
+    val showConfirmationDialog by viewModel.showConfirmationDialog.collectAsState()
+    SetPointTheme {
+        if (showConfirmationDialog) {
+            confirmationDialog(
+                text = "Confirm match reset?",
+                onConfirm = { viewModel.onEvent(OnClickConfirmResetEvent) },
+                onCancel = { viewModel.onEvent(OnClickCancelResetEvent) })
+        } else {
+            NavigationScreen(viewModel = viewModel,
+                settingsViewModel = settingsViewModel,
+                onIncrementPlayer1 = { viewModel.onEvent(OnClickPLayerOneScoredEvent) },
+                onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) },
+                onUndo = { viewModel.onEvent(OnClickUndoEvent) },
+                onShowSettings = { viewModel.onEvent(OnClickSettingsEvent) },
+                onResetScore = { viewModel.onEvent(OnClickResetEvent) },
+                onSettingsShown = { viewModel.onEvent(OnSettingsShownEvent) })
+        }
+    }
 }
 
 @Composable
@@ -96,6 +106,7 @@ fun NavigationScreen(
     onIncrementPlayer2: () -> Unit,
     onUndo: () -> Unit,
     onShowSettings: () -> Unit,
+    onResetScore: () -> Unit,
     onSettingsShown: () -> Unit
 ) {
     val state by viewModel.mainScreenState.collectAsState()
@@ -123,6 +134,7 @@ fun NavigationScreen(
                     onIncrementPlayer1,
                     onIncrementPlayer2,
                     onUndo,
+                    onResetScore,
                     onShowSettings
                 )
             }
@@ -141,6 +153,7 @@ private fun TennisMatchScreen(
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
     onUndo: () -> Unit,
+    onResetScore: () -> Unit,
     onShowSettings: () -> Unit,
 ) {
     if (state.showEndedMatchAlert) {
@@ -153,6 +166,7 @@ private fun TennisMatchScreen(
             onIncrementPlayer1,
             onIncrementPlayer2,
             onUndo,
+            onResetScore,
             onShowSettings
         )
     }
@@ -166,6 +180,7 @@ private fun MatchScoreBoard(
     state: MainScreenState,
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
+    onUndo: () -> Unit,
     onResetScore: () -> Unit,
     onShowSettings: () -> Unit
 ) {
@@ -192,10 +207,10 @@ private fun MatchScoreBoard(
                 )
             }
             item {
-                GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2, onResetScore)
+                GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2, onUndo)
             }
             item {
-                ResetAndSettingsRow(state, onShowSettings)
+                ResetAndSettingsRow(onShowSettings, onResetScore)
             }
         }
     }
@@ -239,7 +254,7 @@ private fun GameScoreRow(
     state: MainScreenState,
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
-    onResetScore: () -> Unit
+    onUndo: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -264,7 +279,7 @@ private fun GameScoreRow(
                 .aspectRatio(1f),
             contentAlignment = Alignment.Center
         ) {
-            UndoButton(state.undoButtonEnabled, onResetScore)
+            UndoButton(state.undoButtonEnabled, onUndo)
         }
         Spacer(modifier = Modifier.size(8.dp)) // Add space between button
         Box(
@@ -284,16 +299,23 @@ private fun GameScoreRow(
 
 @Composable
 private fun ResetAndSettingsRow(
-    state: MainScreenState,
-    onShowSettings: () -> Unit
+    onShowSettings: () -> Unit,
+    onResetScore: () -> Unit
 ) {
-    //TODO: Add a reset button
     Row {
         CompactButton(
             onClick = { onShowSettings() },
         ) {
             Icon(
                 Icons.Rounded.Settings,
+                contentDescription = ""
+            )
+        }
+        CompactButton(
+            onClick = { onResetScore() },
+        ) {
+            Icon(
+                Icons.Rounded.RestartAlt,
                 contentDescription = ""
             )
         }
