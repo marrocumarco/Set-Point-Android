@@ -37,6 +37,8 @@ class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchU
                 player1PointsDescription = matchUseCase.player1PointsDescription,
                 player2PointsDescription = matchUseCase.player2PointsDescription,
                 winnerDescription = matchUseCase.winnerDescription,
+                player1FinalScoreDescription = matchUseCase.player1FinalScoreDescription,
+                player2FinalScoreDescription = matchUseCase.player2FinalScoreDescription,
                 player1NumberOfGames = matchUseCase.player1NumberOfGames,
                 player2NumberOfGames = matchUseCase.player2NumberOfGames,
                 player1NumberOfSets = matchUseCase.player1NumberOfSets,

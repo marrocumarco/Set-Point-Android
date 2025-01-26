@@ -4,11 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
-import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
-import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,16 +31,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.TimeText
-import androidx.wear.compose.material.dialog.Confirmation
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -55,7 +46,6 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
-import com.marrocumarcodeveloper.set_point.R
 import com.marrocumarcodeveloper.set_point.presentation.components.confirmationDialog
 import com.marrocumarcodeveloper.set_point.presentation.theme.SetPointTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -157,7 +147,15 @@ private fun TennisMatchScreen(
     onShowSettings: () -> Unit,
 ) {
     if (state.showEndedMatchAlert) {
-        GameOverConfirmation(state.winnerDescription, onUndo)
+        GameOverConfirmation(
+            state.winnerDescription,
+            player1Name,
+            player2Name,
+            state.player1FinalScoreDescription,
+            state.player2FinalScoreDescription,
+            onUndo,
+            onResetScore
+        )
     } else {
         MatchScoreBoard(
             player1Name,
@@ -217,35 +215,58 @@ private fun MatchScoreBoard(
 }
 
 @Composable
-@OptIn(ExperimentalAnimationGraphicsApi::class)
-private fun GameOverConfirmation(winnerDescription: String, onUndo: () -> Unit) {
-    val animation = AnimatedImageVector.animatedVectorResource(R.drawable.checkmark_animation)
-    Confirmation(
-        onTimeout = {
-            /* Do something e.g. navController.popBackStack() */
-        },
-        icon = {
-            // Initially, animation is static and shown at the start position (atEnd = false).
-            // Then, we use the EffectAPI to trigger a state change to atEnd = true,
-            // which plays the animation from start to end.
-            var atEnd by remember { mutableStateOf(false) }
-            DisposableEffect(Unit) {
-                atEnd = true
-                onDispose {}
-            }
-            Image(
-                painter = rememberAnimatedVectorPainter(animation, atEnd),
-                contentDescription = "Open on phone",
-                modifier = Modifier.size(48.dp)
-            )
-        },
-        durationMillis = animation.totalDuration * 2L,
+private fun GameOverConfirmation(
+    winnerDescription: String,
+    player1Name: String,
+    player2Name: String,
+    player1Score: String,
+    player2Score: String,
+    onUndoTap: () -> Unit,
+    onResetTap: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Text(
-            text = "$winnerDescription wins!",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            text = winnerDescription,
             textAlign = TextAlign.Center
         )
-        UndoButton(true, onUndo)
+        Column {
+            PlayerScoreRow(player1Name, player1Score)
+            PlayerScoreRow(player2Name, player2Score)
+        }
+
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Bottom) {
+            UndoButton(true, onUndoTap)
+            ResetButton(onResetTap)
+        }
+    }
+}
+
+@Composable
+private fun PlayerScoreRow(winnerDescription: String, winnerScore: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = winnerDescription,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = winnerScore,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -303,22 +324,32 @@ private fun ResetAndSettingsRow(
     onResetScore: () -> Unit
 ) {
     Row {
-        CompactButton(
-            onClick = { onShowSettings() },
-        ) {
-            Icon(
-                Icons.Rounded.Settings,
-                contentDescription = ""
-            )
-        }
-        CompactButton(
-            onClick = { onResetScore() },
-        ) {
-            Icon(
-                Icons.Rounded.RestartAlt,
-                contentDescription = ""
-            )
-        }
+        SettingsButton(onShowSettings)
+        ResetButton(onResetScore)
+    }
+}
+
+@Composable
+private fun SettingsButton(onShowSettings: () -> Unit) {
+    CompactButton(
+        onClick = { onShowSettings() },
+    ) {
+        Icon(
+            Icons.Rounded.Settings,
+            contentDescription = ""
+        )
+    }
+}
+
+@Composable
+private fun ResetButton(onResetScore: () -> Unit) {
+    CompactButton(
+        onClick = { onResetScore() }
+    ) {
+        Icon(
+            Icons.Rounded.RestartAlt,
+            contentDescription = ""
+        )
     }
 }
 
@@ -382,5 +413,5 @@ fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> 
 @Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    PlayerScoreButton("1", true) {}
+    GameOverConfirmation("P1", "P1", "P2", "1 2 3 4 5", "1 2 3 4 5", {}, {})
 }

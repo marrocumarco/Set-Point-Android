@@ -20,7 +20,11 @@ class MatchUseCase(private val match: Match) {
     val player2NumberOfGames: Int
         get() = match.player2NumberOfGames
     val winnerDescription: String
-        get() = match.winnerDescription
+        get() = "Game, set, match " + match.winnerDescription
+    val player1FinalScoreDescription: String
+        get() = match.endedSets.map { "${it.player1Score}" }.joinToString(" ")
+    val player2FinalScoreDescription: String
+        get() = match.endedSets.map { "${it.player2Score}" }.joinToString(" ")
     val matchEnded: Boolean
         get() = match.matchEnded
     val endedSets: ArrayList<EndedSet>
