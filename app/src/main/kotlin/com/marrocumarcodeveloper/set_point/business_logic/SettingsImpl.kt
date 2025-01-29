@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 class SettingsImpl(private val sharedPref: SharedPreferences) : Settings {
 
     private val selectableNumbersOfSets = intArrayOf(1,3,5)
-    //private var selectedNumberOfSets: Int = defaultNumberOfSets
+
     private var defaultTieBreakEnabled = true
 
     override fun setSelectedNumberOfSets(numberOfSets: Int) {

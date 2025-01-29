@@ -22,7 +22,7 @@ class SettingsUseCaseTest {
         val expectedSets = intArrayOf(3, 5)
         `when`(settings.getNumberOfSets()).thenReturn(expectedSets)
 
-        val result = settingsUseCase.getNumberOfSets()
+        val result = settingsUseCase.getSelectableNumberOfSets()
 
         assertArrayEquals(expectedSets, result)
         verify(settings).getNumberOfSets()

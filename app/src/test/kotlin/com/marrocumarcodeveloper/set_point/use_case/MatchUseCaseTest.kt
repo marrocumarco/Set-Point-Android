@@ -64,7 +64,7 @@ class MatchUseCaseTest {
     @Test
     fun getWinnerDescription() {
         `when`(match.winnerDescription).thenReturn("P1")
-        assertEquals("P1", matchUseCase.winnerDescription)
+        assertEquals("Game, set, match P1", matchUseCase.winnerDescription)
     }
 
     @Test
