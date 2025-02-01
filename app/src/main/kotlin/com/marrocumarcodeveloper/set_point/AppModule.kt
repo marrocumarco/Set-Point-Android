@@ -12,7 +12,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+internal object AppModule {
 
     @Provides
     fun provideMatchRepository(settings: Settings): Match {

@@ -1,6 +1,6 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
-data class MatchState(
+internal data class MatchState(
     val player1Points: Int,
     val player1Games: Int,
     val player1Sets: Int,

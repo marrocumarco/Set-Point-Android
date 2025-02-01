@@ -46,7 +46,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.marrocumarcodeveloper.set_point.presentation.components.SettingsScreen
-import com.marrocumarcodeveloper.set_point.presentation.components.confirmationDialog
+import com.marrocumarcodeveloper.set_point.presentation.components.ConfirmationDialog
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickCancelResetEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmResetEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickPLayerOneScoredEvent
@@ -76,11 +76,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewModel) {
+private fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewModel) {
     val showConfirmationDialog by viewModel.showConfirmationDialog.collectAsState()
     SetPointTheme {
         if (showConfirmationDialog) {
-            confirmationDialog(
+            ConfirmationDialog(
                 text = "Confirm match reset?",
                 onConfirm = { viewModel.onEvent(OnClickConfirmResetEvent) },
                 onCancel = { viewModel.onEvent(OnClickCancelResetEvent) })
@@ -98,7 +98,7 @@ fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewMod
 }
 
 @Composable
-fun NavigationScreen(
+private fun NavigationScreen(
     viewModel: MainActivityViewModel,
     settingsViewModel: SettingsViewModel,
     player1Name: String = "P1",
@@ -379,7 +379,7 @@ private fun UndoButton(enabled: Boolean, onUndo: () -> Unit) {
 }
 
 @Composable
-fun SetsScoreColumn(player1Name: String, player2Name: String, state: MainScreenState) {
+private fun SetsScoreColumn(player1Name: String, player2Name: String, state: MainScreenState) {
     Column {
         ThreeLabelsRow(player1Name, "", player2Name)
         ThreeLabelsRow(

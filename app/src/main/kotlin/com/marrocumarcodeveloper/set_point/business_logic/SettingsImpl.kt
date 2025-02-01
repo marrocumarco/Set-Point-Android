@@ -2,7 +2,7 @@ package com.marrocumarcodeveloper.set_point.business_logic
 
 import android.content.SharedPreferences
 
-class SettingsImpl(private val sharedPref: SharedPreferences) : Settings {
+internal class SettingsImpl(private val sharedPref: SharedPreferences) : Settings {
 
     private val selectableNumbersOfSets = intArrayOf(1,3,5)
 

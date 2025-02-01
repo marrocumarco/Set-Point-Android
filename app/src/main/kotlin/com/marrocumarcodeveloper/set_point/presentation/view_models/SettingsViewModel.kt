@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(private var settingsUseCase: SettingsUseCase) : ViewModel() {
+internal class SettingsViewModel @Inject constructor(private var settingsUseCase: SettingsUseCase) : ViewModel() {
 
     private val _settingsScreenState = MutableStateFlow(SettingsScreenState.initialValue)
     val settingsScreenState: StateFlow<SettingsScreenState> = _settingsScreenState.asStateFlow()

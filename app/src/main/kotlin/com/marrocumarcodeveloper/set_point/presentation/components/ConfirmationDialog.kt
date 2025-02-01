@@ -20,7 +20,7 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.dialog.Confirmation
 
 @Composable
-fun confirmationDialog(text: String, onConfirm: () -> Unit, onCancel: () -> Unit) {
+internal fun ConfirmationDialog(text: String, onConfirm: () -> Unit, onCancel: () -> Unit) {
     Confirmation(
         onTimeout = { onCancel() },
         icon = {

@@ -4,7 +4,7 @@ import com.marrocumarcodeveloper.set_point.business_logic.EndedSet
 import com.marrocumarcodeveloper.set_point.business_logic.Match
 import java.util.ArrayList
 
-class MatchUseCase(private val match: Match) {
+internal class MatchUseCase(private val match: Match) {
     val canUndo: Boolean
         get() = match.canUndo
     val player1PointsDescription: String

@@ -1,9 +1,11 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
+import com.marrocumarcodeveloper.set_point.presentation.events.MainViewEvent
+import com.marrocumarcodeveloper.set_point.presentation.states.MainScreenState
 import java.util.EmptyStackException
 import java.util.Stack
 
-class MatchImpl(val settings: Settings) : Match {
+internal class MatchImpl(val settings: Settings) : Match {
 
     private var playerScore1 = PlayerScore("P1")
     private var playerScore2 = PlayerScore("P2")

@@ -32,7 +32,7 @@ import com.marrocumarcodeveloper.set_point.presentation.events.OnClickTiebreakEv
 import com.marrocumarcodeveloper.set_point.presentation.view_models.SettingsViewModel
 
 @Composable
-fun SettingsScreen(settingsViewModel: SettingsViewModel) {
+internal fun SettingsScreen(settingsViewModel: SettingsViewModel) {
     val state = settingsViewModel.settingsScreenState.collectAsState()
 
     TileList(
@@ -50,7 +50,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
 }
 
 @Composable
-fun TileList(
+private fun TileList(
     state: SettingsScreenState,
     onclickTiebreakChip: () -> Unit,
     onclickNumberOfSetsChip: () -> Unit

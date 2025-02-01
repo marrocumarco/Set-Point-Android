@@ -1,5 +1,5 @@
 package com.marrocumarcodeveloper.set_point.presentation.events
 
-sealed class SettingsViewEvent
-data object OnClickTiebreakEvent : SettingsViewEvent()
-data object OnClickNumberOfSetsSelectedEvent : SettingsViewEvent()
+internal sealed class SettingsViewEvent
+internal data object OnClickTiebreakEvent : SettingsViewEvent()
+internal data object OnClickNumberOfSetsSelectedEvent : SettingsViewEvent()

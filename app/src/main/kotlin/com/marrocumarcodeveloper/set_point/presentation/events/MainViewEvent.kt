@@ -1,11 +1,11 @@
 package com.marrocumarcodeveloper.set_point.presentation.events
 
-sealed class MainViewEvent
-data object OnClickPLayerOneScoredEvent : MainViewEvent()
-data object OnClickPLayerTwoScoredEvent : MainViewEvent()
-data object OnClickUndoEvent : MainViewEvent()
-data object OnClickSettingsEvent : MainViewEvent()
-data object OnSettingsShownEvent : MainViewEvent()
-data object OnClickResetEvent : MainViewEvent()
-data object OnClickConfirmResetEvent : MainViewEvent()
-data object OnClickCancelResetEvent : MainViewEvent()
+internal sealed class MainViewEvent
+internal data object OnClickPLayerOneScoredEvent : MainViewEvent()
+internal data object OnClickPLayerTwoScoredEvent : MainViewEvent()
+internal data object OnClickUndoEvent : MainViewEvent()
+internal data object OnClickSettingsEvent : MainViewEvent()
+internal data object OnSettingsShownEvent : MainViewEvent()
+internal data object OnClickResetEvent : MainViewEvent()
+internal data object OnClickConfirmResetEvent : MainViewEvent()
+internal data object OnClickCancelResetEvent : MainViewEvent()

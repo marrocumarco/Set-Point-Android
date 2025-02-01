@@ -1,6 +1,6 @@
 package com.marrocumarcodeveloper.set_point.presentation.states
 
-data class MainScreenState(
+internal data class MainScreenState(
     val player1Serves: Boolean,
     val player1PointsDescription: String,
     val player2PointsDescription: String,

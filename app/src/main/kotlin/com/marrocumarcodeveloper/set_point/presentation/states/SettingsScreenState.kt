@@ -1,6 +1,6 @@
 package com.marrocumarcodeveloper.set_point.presentation.states
 
-data class SettingsScreenState(
+internal data class SettingsScreenState(
     val tiebreakEnabled: Boolean,
     val selectedNumberOfSets: Int,
     val numberOfSets: IntArray
