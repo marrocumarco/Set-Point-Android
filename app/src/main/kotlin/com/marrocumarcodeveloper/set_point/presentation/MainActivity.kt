@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,8 +45,20 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
+import com.marrocumarcodeveloper.set_point.presentation.components.SettingsScreen
 import com.marrocumarcodeveloper.set_point.presentation.components.confirmationDialog
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickCancelResetEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmResetEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickPLayerOneScoredEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickPLayerTwoScoredEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickResetEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickSettingsEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickUndoEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnSettingsShownEvent
+import com.marrocumarcodeveloper.set_point.presentation.states.MainScreenState
 import com.marrocumarcodeveloper.set_point.presentation.theme.SetPointTheme
+import com.marrocumarcodeveloper.set_point.presentation.view_models.MainActivityViewModel
+import com.marrocumarcodeveloper.set_point.presentation.view_models.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

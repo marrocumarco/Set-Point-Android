@@ -1,4 +1,4 @@
-package com.marrocumarcodeveloper.set_point.presentation
+package com.marrocumarcodeveloper.set_point.presentation.states
 
 data class MainScreenState(
     val player1Serves: Boolean,

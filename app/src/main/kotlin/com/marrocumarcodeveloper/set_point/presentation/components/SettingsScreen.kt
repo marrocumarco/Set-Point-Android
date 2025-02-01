@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalHorologistApi::class)
 
-package com.marrocumarcodeveloper.set_point.presentation
+package com.marrocumarcodeveloper.set_point.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -26,6 +26,10 @@ import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.rememberColumnState
+import com.marrocumarcodeveloper.set_point.presentation.states.SettingsScreenState
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickNumberOfSetsSelectedEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickTiebreakEvent
+import com.marrocumarcodeveloper.set_point.presentation.view_models.SettingsViewModel
 
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel) {

@@ -1,4 +1,4 @@
-package com.marrocumarcodeveloper.set_point.presentation
+package com.marrocumarcodeveloper.set_point.presentation.events
 
 sealed class MainViewEvent
 data object OnClickPLayerOneScoredEvent : MainViewEvent()

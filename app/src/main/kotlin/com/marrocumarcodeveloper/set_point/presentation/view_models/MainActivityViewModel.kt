@@ -1,7 +1,17 @@
-package com.marrocumarcodeveloper.set_point.presentation
+package com.marrocumarcodeveloper.set_point.presentation.view_models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.marrocumarcodeveloper.set_point.presentation.states.MainScreenState
+import com.marrocumarcodeveloper.set_point.presentation.events.MainViewEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickCancelResetEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmResetEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickPLayerOneScoredEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickPLayerTwoScoredEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickResetEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickSettingsEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickUndoEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnSettingsShownEvent
 import com.marrocumarcodeveloper.set_point.use_case.MatchUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
