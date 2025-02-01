@@ -1,49 +1,45 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
-import android.content.SharedPreferences
+internal class SettingsImpl : Settings {
 
-internal class SettingsImpl(private val sharedPref: SharedPreferences) : Settings {
-
-    private val selectableNumbersOfSets = intArrayOf(1,3,5)
-
-    private var defaultTieBreakEnabled = true
+    private val selectableNumbersOfSets = intArrayOf(1, 3, 5)
+    private var selectedNumberOfSets = defaultNumberOfSets
+    private var tiebreakEnabled = defaultTiebreakEnabled
 
     override fun setSelectedNumberOfSets(numberOfSets: Int) {
-
         if (selectableNumbersOfSets.contains(numberOfSets)) {
-            sharedPref.edit().apply {
-                putInt(NUMBER_OF_SETS, numberOfSets)
-                apply()
-            }
+            selectedNumberOfSets = numberOfSets
         } else {
             throw IllegalArgumentException("Invalid number of sets")
         }
     }
 
     override fun getSelectedNumberOfSets(): Int {
-        return sharedPref.getInt(NUMBER_OF_SETS, defaultNumberOfSets)
+        return selectedNumberOfSets
     }
 
-    override fun getNumberOfSets(): IntArray {
+    override fun getDefaultNumberOfSets(): Int {
+        return defaultNumberOfSets
+    }
+
+    override fun getSelectableNumberOfSets(): IntArray {
         return selectableNumbersOfSets
     }
 
     override fun setTiebreakEnabled(enabled: Boolean) {
-        sharedPref.edit().apply {
-            putBoolean(
-                TIEBREAK_ENABLED, enabled)
-            apply()
-        }
+        tiebreakEnabled = enabled
     }
 
     override fun getTiebreakEnabled(): Boolean {
-        return sharedPref.getBoolean(TIEBREAK_ENABLED, defaultTieBreakEnabled)
+        return tiebreakEnabled
+    }
+
+    override fun getDefaultTiebreakEnabled(): Boolean {
+        return defaultTiebreakEnabled
     }
 
     companion object {
-        const val NUMBER_OF_SETS = "number_of_sets"
-        const val TIEBREAK_ENABLED = "tiebreak_enabled"
-
-        const val defaultNumberOfSets = 3
+        const val defaultNumberOfSets = 5
+        const val defaultTiebreakEnabled = false
     }
 }

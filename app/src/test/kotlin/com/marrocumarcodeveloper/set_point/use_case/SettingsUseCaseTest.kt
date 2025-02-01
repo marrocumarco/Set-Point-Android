@@ -9,23 +9,25 @@ import org.mockito.Mockito.*
 class SettingsUseCaseTest {
 
     private lateinit var settings: Settings
+    private lateinit var dataAccess: DataAccess
     private lateinit var settingsUseCase: SettingsUseCase
 
     @BeforeEach
     fun setUp() {
         settings = mock(Settings::class.java)
-        settingsUseCase = SettingsUseCase(settings)
+        dataAccess = mock(DataAccess::class.java)
+        settingsUseCase = SettingsUseCase(settings, dataAccess)
     }
 
     @Test
-    fun getNumberOfSets() {
+    fun getSelectableNumberOfSets() {
         val expectedSets = intArrayOf(3, 5)
-        `when`(settings.getNumberOfSets()).thenReturn(expectedSets)
+        `when`(settings.getSelectableNumberOfSets()).thenReturn(expectedSets)
 
         val result = settingsUseCase.getSelectableNumberOfSets()
 
         assertArrayEquals(expectedSets, result)
-        verify(settings).getNumberOfSets()
+        verify(settings).getSelectableNumberOfSets()
     }
 
     @Test
@@ -35,17 +37,17 @@ class SettingsUseCaseTest {
         settingsUseCase.setSelectedNumberOfSets(numberOfSets)
 
         verify(settings).setSelectedNumberOfSets(numberOfSets)
+        verify(dataAccess).setSelectedNumberOfSets(numberOfSets)
     }
 
     @Test
     fun getSelectedNumberOfSets() {
         val expectedNumberOfSets = 3
-        `when`(settings.getSelectedNumberOfSets()).thenReturn(expectedNumberOfSets)
+        `when`(dataAccess.getSelectedNumberOfSets(settings.getDefaultNumberOfSets())).thenReturn(expectedNumberOfSets)
 
         val result = settingsUseCase.getSelectedNumberOfSets()
 
         assertEquals(expectedNumberOfSets, result)
-        verify(settings).getSelectedNumberOfSets()
     }
 
     @Test
@@ -55,16 +57,16 @@ class SettingsUseCaseTest {
         settingsUseCase.setTiebreakEnabled(enabled)
 
         verify(settings).setTiebreakEnabled(enabled)
+        verify(dataAccess).setTiebreakEnabled(enabled)
     }
 
     @Test
     fun getTiebreakEnabled() {
         val expectedEnabled = true
-        `when`(settings.getTiebreakEnabled()).thenReturn(expectedEnabled)
+        `when`(dataAccess.getTiebreakEnabled(settings.getDefaultTiebreakEnabled())).thenReturn(expectedEnabled)
 
         val result = settingsUseCase.getTiebreakEnabled()
 
         assertEquals(expectedEnabled, result)
-        verify(settings).getTiebreakEnabled()
     }
 }

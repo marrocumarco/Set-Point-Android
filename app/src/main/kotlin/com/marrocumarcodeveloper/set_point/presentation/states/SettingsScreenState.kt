@@ -24,12 +24,4 @@ internal data class SettingsScreenState(
         result = 31 * result + numberOfSets.contentHashCode()
         return result
     }
-
-    companion object {
-        val initialValue = SettingsScreenState(
-            tiebreakEnabled = true,
-            selectedNumberOfSets = 3,
-            numberOfSets = intArrayOf(1,3,5)
-        )
-    }
 }

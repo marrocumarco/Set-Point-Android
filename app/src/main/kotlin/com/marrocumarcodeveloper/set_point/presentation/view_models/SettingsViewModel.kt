@@ -13,9 +13,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-internal class SettingsViewModel @Inject constructor(private var settingsUseCase: SettingsUseCase) : ViewModel() {
+internal class SettingsViewModel @Inject constructor(private var settingsUseCase: SettingsUseCase) :
+    ViewModel() {
 
-    private val _settingsScreenState = MutableStateFlow(SettingsScreenState.initialValue)
+    private val _settingsScreenState = MutableStateFlow(
+        SettingsScreenState(
+            settingsUseCase.getTiebreakEnabled(),
+            settingsUseCase.getSelectedNumberOfSets(),
+            settingsUseCase.getSelectableNumberOfSets()
+        )
+    )
+
     val settingsScreenState: StateFlow<SettingsScreenState> = _settingsScreenState.asStateFlow()
 
     private fun currentState(): SettingsScreenState = _settingsScreenState.value
@@ -41,6 +49,7 @@ internal class SettingsViewModel @Inject constructor(private var settingsUseCase
             is OnClickNumberOfSetsSelectedEvent -> onClickNumberOfSetsSelected()
         }
     }
+
     fun onTiebreakEnabledStateChanged() {
         settingsUseCase.setTiebreakEnabled(currentState().tiebreakEnabled.not())
         updateState()

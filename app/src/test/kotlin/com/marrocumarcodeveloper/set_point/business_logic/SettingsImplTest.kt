@@ -1,77 +1,44 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
-import android.content.SharedPreferences
-import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.*
-import kotlin.test.DefaultAsserter.assertEquals
 
 class SettingsImplTest {
 
-    private lateinit var sharedPref: SharedPreferences
     private lateinit var settings: SettingsImpl
 
     @BeforeEach
     fun setUp() {
-        sharedPref = mock(SharedPreferences::class.java)
-        settings = SettingsImpl(sharedPref)
+        settings = SettingsImpl()
     }
 
     @Test
-    fun setSelectedNumberOfSets() {
-        val editor = mock(SharedPreferences.Editor::class.java)
-        `when`(sharedPref.edit()).thenReturn(editor)
-        `when`(editor.putInt(anyString(), anyInt())).thenReturn(editor)
-
-        settings.setSelectedNumberOfSets(5)
-
-        verify(editor).putInt(SettingsImpl.NUMBER_OF_SETS, 5)
-        verify(editor).apply()
+    fun setSelectedNumberOfSets_validNumberOfSets_success() {
+        settings.setSelectedNumberOfSets(3)
+        assertEquals(3, settings.getSelectedNumberOfSets())
     }
 
     @Test
-    fun setSelectedNumberOfSets_invalidNumberOfSets_failure() {
-        assertThrows<IllegalArgumentException> { settings.setSelectedNumberOfSets(0) }
+    fun setSelectedNumberOfSets_invalidNumberOfSets_throwsException() {
+        assertThrows<IllegalArgumentException> { settings.setSelectedNumberOfSets(2) }
     }
 
     @Test
-    fun getSelectedNumberOfSets() {
-        `when`(sharedPref.getInt(SettingsImpl.NUMBER_OF_SETS, SettingsImpl.defaultNumberOfSets))
-            .thenReturn(3)
-
-        val result = settings.getSelectedNumberOfSets()
-
-        assertEquals(expected = 3, actual = result, message = null)
+    fun getSelectedNumberOfSets_defaultValue() {
+        assertEquals(SettingsImpl.defaultNumberOfSets, settings.getSelectedNumberOfSets())
     }
 
     @Test
-    fun getNumberOfSets() {
-        val result = settings.getNumberOfSets()
-
-        assertArrayEquals(intArrayOf(1, 3, 5), result)
-    }
-
-    @Test
-    fun setTiebreakEnabled() {
-        val editor = mock(SharedPreferences.Editor::class.java)
-        `when`(sharedPref.edit()).thenReturn(editor)
-        `when`(editor.putBoolean(anyString(), anyBoolean())).thenReturn(editor)
-
+    fun setTiebreakEnabled_true() {
         settings.setTiebreakEnabled(true)
-
-        verify(editor).putBoolean(SettingsImpl.TIEBREAK_ENABLED, true)
-        verify(editor).apply()
+        assertTrue(settings.getTiebreakEnabled())
     }
 
     @Test
-    fun getTiebreakEnabled() {
-        `when`(sharedPref.getBoolean(SettingsImpl.TIEBREAK_ENABLED, true))
-            .thenReturn(true)
-
-        val result = settings.getTiebreakEnabled()
-
-        assert(result)
+    fun setTiebreakEnabled_false() {
+        settings.setTiebreakEnabled(false)
+        assertFalse(settings.getTiebreakEnabled())
     }
 }
