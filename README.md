@@ -5,7 +5,7 @@ Welcome to Set-Point! Set-Point is an intuitive and efficient scorekeeping app d
 ## Features
 
 - Effortless Scoring: Keep accurate track of scores with just a few taps.
-- Intuitive Interface: User-friendly design tailored for the Apple Watch.
+- Intuitive Interface: User-friendly design tailored for Wear OS.
 - Multiple Sports: Perfect for tennis, but versatile enough for similar sports.
 - Customizable Settings: Personalize scoring rules and formats.
 
