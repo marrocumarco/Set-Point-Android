@@ -13,6 +13,7 @@ internal data class MainScreenState(
     val player2FinalScoreDescription: String,
     val showCurrentSetScore: Boolean,
     val showEndedMatchAlert: Boolean,
+    val showConfirmSettingsAlert: Boolean,
     val pointButtonsEnabled: Boolean,
     val undoButtonEnabled: Boolean
 ) {
@@ -30,6 +31,7 @@ internal data class MainScreenState(
             player2FinalScoreDescription = "",
             showCurrentSetScore = true,
             showEndedMatchAlert = false,
+            showConfirmSettingsAlert = false,
             pointButtonsEnabled = true,
             undoButtonEnabled = false
         )

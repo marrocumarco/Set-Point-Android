@@ -11,7 +11,8 @@ import com.marrocumarcodeveloper.set_point.presentation.events.OnClickPLayerTwoS
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickResetEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickSettingsEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickUndoEvent
-import com.marrocumarcodeveloper.set_point.presentation.events.OnSettingsShownEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnConfirmSettingsAlertClosedEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnSettingsScreenClosedEvent
 import com.marrocumarcodeveloper.set_point.use_case.MatchUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,9 +54,10 @@ internal class MainActivityViewModel @Inject constructor(private var matchUseCas
                 player2NumberOfGames = matchUseCase.player2NumberOfGames,
                 player1NumberOfSets = matchUseCase.player1NumberOfSets,
                 player2NumberOfSets = matchUseCase.player2NumberOfSets,
-                showCurrentSetScore = matchUseCase.matchEnded.not(),
+                showCurrentSetScore = matchUseCase.matchEnded.not(), //TODO move decision to use case
                 showEndedMatchAlert = matchUseCase.matchEnded,
-                pointButtonsEnabled = matchUseCase.matchEnded.not(),
+                showConfirmSettingsAlert = matchUseCase.showConfirmSettingsAlert,
+                pointButtonsEnabled = matchUseCase.matchEnded.not(), //TODO move decision to use case
                 undoButtonEnabled = matchUseCase.canUndo
             )
         )
@@ -69,12 +71,17 @@ internal class MainActivityViewModel @Inject constructor(private var matchUseCas
                 is OnClickPLayerTwoScoredEvent -> onClickPlayerTwoScoredEvent()
                 is OnClickUndoEvent -> onClickUndoEvent()
                 is OnClickSettingsEvent -> onClickSettingsEvent()
-                is OnSettingsShownEvent -> onSettingsShown()
+                is OnSettingsScreenClosedEvent -> onSettingsScreenClosedEvent()
+                is OnConfirmSettingsAlertClosedEvent -> onConfirmSettingsAlertClosedEvent(confirm = event.confirm)
                 is OnClickResetEvent -> onClickResetEvent()
                 is OnClickConfirmResetEvent -> OnClickConfirmResetEvent()
                 is OnClickCancelResetEvent -> onClickCancelResetEvent()
             }
         }
+    }
+
+    private fun onSettingsScreenClosedEvent() {
+        _navigationEvent.value = null
     }
 
     private fun onClickResetEvent() {
@@ -110,7 +117,10 @@ internal class MainActivityViewModel @Inject constructor(private var matchUseCas
         _navigationEvent.value = OnClickSettingsEvent
     }
 
-    private fun onSettingsShown() {
-        _navigationEvent.value = null
+    private suspend fun onConfirmSettingsAlertClosedEvent(confirm: Boolean) {
+        if (confirm) {
+            matchUseCase.resetMatch()
+            updateState()
+        }
     }
 }

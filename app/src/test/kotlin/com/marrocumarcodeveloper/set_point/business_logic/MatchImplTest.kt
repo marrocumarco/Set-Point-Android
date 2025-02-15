@@ -22,12 +22,16 @@ class MatchImplTest {
     @Test
     fun resetMatch_shouldResetTheMatch() {
         runBlocking {
+            goToDeuce()
             match.resetMatch()
+
             assertEquals(0, match.player1NumberOfSets)
             assertEquals(0, match.player2NumberOfSets)
             assertEquals(0, match.endedSets.size)
             assertFalse(match.matchEnded)
             assertTrue(match.player1Serves)
+            assertFalse(match.shouldRestartMatch)
+            verify(settings).resetSettingsStatus()
         }
     }
 
@@ -234,5 +238,19 @@ class MatchImplTest {
         runBlocking {
             assertTrue(match.player1Serves)
         }
+    }
+
+    @Test
+    fun shouldRestartMatch_true() {
+        `when`(settings.getSettingsChanged()).thenReturn(true)
+
+        assertTrue(match.shouldRestartMatch)
+
+    }
+
+    @Test
+    fun shouldRestartMatch_false() {
+        `when`(settings.getSettingsChanged()).thenReturn(false)
+        assertFalse(match.shouldRestartMatch)
     }
 }

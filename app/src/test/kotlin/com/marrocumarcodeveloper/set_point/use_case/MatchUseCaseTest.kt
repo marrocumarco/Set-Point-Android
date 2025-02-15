@@ -117,4 +117,42 @@ class MatchUseCaseTest {
             verify(match).undo()
         }
     }
+
+    @Test
+    fun shouldShowResetMatchAlert_true() {
+        `when`(match.shouldRestartMatch).thenReturn(true)
+        assertTrue(matchUseCase.shouldShowResetMatchAlert())
+    }
+
+    @Test
+    fun shouldShowResetMatchAlert_false() {
+        `when`(match.shouldRestartMatch).thenReturn(false)
+        assertFalse(matchUseCase.shouldShowResetMatchAlert())
+    }
+
+    @Test
+    fun showConfirmSettingsAlert_true() {
+        `when`(match.shouldRestartMatch).thenReturn(true)
+        assertTrue(matchUseCase.showConfirmSettingsAlert)
+    }
+
+    @Test
+    fun showConfirmSettingsAlert_false() {
+        `when`(match.shouldRestartMatch).thenReturn(false)
+        assertFalse(matchUseCase.showConfirmSettingsAlert)
+    }
+
+    @Test
+    fun player1FinalScoreDescription_correctFormat() {
+        val endedSets = arrayListOf(EndedSet(6, 4), EndedSet(7, 5))
+        `when`(match.endedSets).thenReturn(endedSets)
+        assertEquals("6 7", matchUseCase.player1FinalScoreDescription)
+    }
+
+    @Test
+    fun player2FinalScoreDescription_correctFormat() {
+        val endedSets = arrayListOf(EndedSet(6, 4), EndedSet(7, 5))
+        `when`(match.endedSets).thenReturn(endedSets)
+        assertEquals("4 5", matchUseCase.player2FinalScoreDescription)
+    }
 }

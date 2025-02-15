@@ -4,6 +4,7 @@ import com.marrocumarcodeveloper.set_point.business_logic.Settings
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.*
 
 class SettingsUseCaseTest {
@@ -36,14 +37,13 @@ class SettingsUseCaseTest {
 
         settingsUseCase.setSelectedNumberOfSets(numberOfSets)
 
-        verify(settings).setSelectedNumberOfSets(numberOfSets)
-        verify(dataAccess).setSelectedNumberOfSets(numberOfSets)
+        verify(settings).setSelectedNumberOfSets(numberOfSets, true)
     }
 
     @Test
     fun getSelectedNumberOfSets() {
         val expectedNumberOfSets = 3
-        `when`(dataAccess.getSelectedNumberOfSets(settings.getDefaultNumberOfSets())).thenReturn(expectedNumberOfSets)
+        `when`(settings.getSelectedNumberOfSets()).thenReturn(expectedNumberOfSets)
 
         val result = settingsUseCase.getSelectedNumberOfSets()
 
@@ -56,17 +56,57 @@ class SettingsUseCaseTest {
 
         settingsUseCase.setTiebreakEnabled(enabled)
 
-        verify(settings).setTiebreakEnabled(enabled)
-        verify(dataAccess).setTiebreakEnabled(enabled)
+        verify(settings).setTiebreakEnabled(enabled, true)
     }
 
     @Test
     fun getTiebreakEnabled() {
         val expectedEnabled = true
-        `when`(dataAccess.getTiebreakEnabled(settings.getDefaultTiebreakEnabled())).thenReturn(expectedEnabled)
+        `when`(settings.getTiebreakEnabled()).thenReturn(expectedEnabled)
 
         val result = settingsUseCase.getTiebreakEnabled()
 
         assertEquals(expectedEnabled, result)
+    }
+
+    @Test
+    fun confirmSettings_savesCurrentSettings() {
+        `when`(settings.getSelectedNumberOfSets()).thenReturn(3)
+        `when`(settings.getTiebreakEnabled()).thenReturn(true)
+
+        settingsUseCase.confirmSettings()
+
+        verify(dataAccess).setSelectedNumberOfSets(3)
+        verify(dataAccess).setTiebreakEnabled(true)
+    }
+
+    @Test
+    fun resetToLastSavedSettings_resetsToSavedValues() {
+        `when`(dataAccess.getSelectedNumberOfSets(settings.getDefaultNumberOfSets())).thenReturn(5)
+        `when`(dataAccess.getTiebreakEnabled(settings.getDefaultTiebreakEnabled())).thenReturn(false)
+
+        settingsUseCase.resetToLastSavedSettings()
+
+        verify(settings).setSelectedNumberOfSets(5, false)
+        verify(settings, times(2)).setTiebreakEnabled(false, false)
+        verify(settings).resetSettingsStatus()
+    }
+
+    @Test
+    fun showConfirmSettingsAlert_settingsChanged_returnsTrue() {
+        `when`(settings.getSettingsChanged()).thenReturn(true)
+
+        val result = settingsUseCase.showConfirmSettingsAlert()
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun showConfirmSettingsAlert_settingsNotChanged_returnsFalse() {
+        `when`(settings.getSettingsChanged()).thenReturn(false)
+
+        val result = settingsUseCase.showConfirmSettingsAlert()
+
+        assertFalse(result)
     }
 }

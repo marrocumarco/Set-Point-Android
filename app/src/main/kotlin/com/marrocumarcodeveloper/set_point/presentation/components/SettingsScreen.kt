@@ -26,15 +26,18 @@ import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.rememberColumnState
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmTileEvent
 import com.marrocumarcodeveloper.set_point.presentation.states.SettingsScreenState
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickNumberOfSetsSelectedEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickTiebreakEvent
 import com.marrocumarcodeveloper.set_point.presentation.view_models.SettingsViewModel
 
 @Composable
-internal fun SettingsScreen(settingsViewModel: SettingsViewModel) {
+internal fun SettingsScreen(
+    settingsViewModel: SettingsViewModel,
+    onSettingsEditEnd: () -> Unit
+) {
     val state = settingsViewModel.settingsScreenState.collectAsState()
-
     TileList(
         state = state.value,
         onclickNumberOfSetsChip = {
@@ -46,6 +49,12 @@ internal fun SettingsScreen(settingsViewModel: SettingsViewModel) {
             settingsViewModel.onEvent(
                 OnClickTiebreakEvent
             )
+        },
+        onclickConfirmChip = {
+            settingsViewModel.onEvent(
+                OnClickConfirmTileEvent
+            )
+            onSettingsEditEnd()
         })
 }
 
@@ -53,7 +62,8 @@ internal fun SettingsScreen(settingsViewModel: SettingsViewModel) {
 private fun TileList(
     state: SettingsScreenState,
     onclickTiebreakChip: () -> Unit,
-    onclickNumberOfSetsChip: () -> Unit
+    onclickNumberOfSetsChip: () -> Unit,
+    onclickConfirmChip: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val isRound = configuration.isScreenRound
@@ -101,6 +111,18 @@ private fun TileList(
                     Text("Sets")
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(text = state.selectedNumberOfSets.toString())
+                }
+            }
+        }
+
+        item {
+            createCustomChip(onClick = onclickConfirmChip) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Confirm")
                 }
             }
         }

@@ -1,7 +1,5 @@
 package com.marrocumarcodeveloper.set_point.business_logic
 
-import com.marrocumarcodeveloper.set_point.presentation.events.MainViewEvent
-import com.marrocumarcodeveloper.set_point.presentation.states.MainScreenState
 import java.util.EmptyStackException
 import java.util.Stack
 
@@ -19,6 +17,8 @@ internal class MatchImpl(val settings: Settings) : Match {
         private set
     override var player1PointsDescription = Point.ZERO.value.toString()
         private set
+    override val shouldRestartMatch: Boolean
+        get() = settings.getSettingsChanged()
     override var player2PointsDescription = Point.ZERO.value.toString()
         private set
     override val player1NumberOfGames: Int
@@ -263,6 +263,7 @@ internal class MatchImpl(val settings: Settings) : Match {
         resetFlags()
         updateScoreDescriptions()
         resetStatesStack()
+        resetSettingsStatus()
     }
 
     private fun resetFlags() {
@@ -289,6 +290,10 @@ internal class MatchImpl(val settings: Settings) : Match {
 
     private fun resetStatesStack() {
         statesStack.removeAllElements()
+    }
+
+    private fun resetSettingsStatus() {
+        settings.resetSettingsStatus()
     }
 
     private fun calculatePointDescription(playerScore: PlayerScore): String {

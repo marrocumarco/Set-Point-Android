@@ -1,6 +1,9 @@
 package com.marrocumarcodeveloper.set_point.presentation.view_models
 
 import androidx.lifecycle.ViewModel
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickCancelEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmTileEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickNumberOfSetsSelectedEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickTiebreakEvent
 import com.marrocumarcodeveloper.set_point.presentation.states.SettingsScreenState
@@ -25,6 +28,8 @@ internal class SettingsViewModel @Inject constructor(private var settingsUseCase
     )
 
     val settingsScreenState: StateFlow<SettingsScreenState> = _settingsScreenState.asStateFlow()
+    private val _showConfirmationDialog = MutableStateFlow(false)
+    val showConfirmationDialog: StateFlow<Boolean> = _showConfirmationDialog.asStateFlow()
 
     private fun currentState(): SettingsScreenState = _settingsScreenState.value
 
@@ -47,7 +52,28 @@ internal class SettingsViewModel @Inject constructor(private var settingsUseCase
         when (event) {
             is OnClickTiebreakEvent -> onTiebreakEnabledStateChanged()
             is OnClickNumberOfSetsSelectedEvent -> onClickNumberOfSetsSelected()
+            is OnClickConfirmTileEvent -> onClickConfirmTileEvent()
+            is OnClickCancelEvent -> onClickCancelEvent()
+            is OnClickConfirmEvent -> onClickConfirmEvent()
         }
+    }
+
+    private fun onClickConfirmTileEvent() {
+        if (settingsUseCase.showConfirmSettingsAlert()) {
+            _showConfirmationDialog.value = true
+        }
+    }
+
+    private fun onClickConfirmEvent() {
+        settingsUseCase.confirmSettings()
+        _showConfirmationDialog.value = false
+        updateState()
+    }
+
+    private fun onClickCancelEvent() {
+        settingsUseCase.resetToLastSavedSettings()
+        _showConfirmationDialog.value = false
+        updateState()
     }
 
     fun onTiebreakEnabledStateChanged() {

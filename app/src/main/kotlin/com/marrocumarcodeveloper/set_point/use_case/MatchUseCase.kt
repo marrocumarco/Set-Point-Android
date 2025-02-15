@@ -5,6 +5,8 @@ import com.marrocumarcodeveloper.set_point.business_logic.Match
 import java.util.ArrayList
 
 internal class MatchUseCase(private val match: Match) {
+    val showConfirmSettingsAlert: Boolean
+        get() = match.shouldRestartMatch
     val canUndo: Boolean
         get() = match.canUndo
     val player1PointsDescription: String
@@ -45,5 +47,9 @@ internal class MatchUseCase(private val match: Match) {
     }
     suspend fun undo() {
         match.undo()
+    }
+
+    fun shouldShowResetMatchAlert(): Boolean {
+        return match.shouldRestartMatch
     }
 }

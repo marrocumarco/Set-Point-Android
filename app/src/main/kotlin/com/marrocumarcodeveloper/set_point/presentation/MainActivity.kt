@@ -47,14 +47,17 @@ import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.marrocumarcodeveloper.set_point.presentation.components.SettingsScreen
 import com.marrocumarcodeveloper.set_point.presentation.components.ConfirmationDialog
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickCancelEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickCancelResetEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmResetEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickPLayerOneScoredEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickPLayerTwoScoredEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickResetEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickSettingsEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickUndoEvent
-import com.marrocumarcodeveloper.set_point.presentation.events.OnSettingsShownEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnConfirmSettingsAlertClosedEvent
+import com.marrocumarcodeveloper.set_point.presentation.events.OnSettingsScreenClosedEvent
 import com.marrocumarcodeveloper.set_point.presentation.states.MainScreenState
 import com.marrocumarcodeveloper.set_point.presentation.theme.SetPointTheme
 import com.marrocumarcodeveloper.set_point.presentation.view_models.MainActivityViewModel
@@ -78,12 +81,24 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewModel) {
     val showConfirmationDialog by viewModel.showConfirmationDialog.collectAsState()
+    val showSettingsConfirmationDialog by settingsViewModel.showConfirmationDialog.collectAsState()
     SetPointTheme {
         if (showConfirmationDialog) {
             ConfirmationDialog(
                 text = "Confirm match reset?",
                 onConfirm = { viewModel.onEvent(OnClickConfirmResetEvent) },
                 onCancel = { viewModel.onEvent(OnClickCancelResetEvent) })
+        } else if (showSettingsConfirmationDialog) {
+            ConfirmationDialog(
+                text = "Confirm settings?\nThe match will be reset.",
+                onConfirm = {
+                    settingsViewModel.onEvent(OnClickConfirmEvent)
+                    viewModel.onEvent(OnConfirmSettingsAlertClosedEvent(true))
+                },
+                onCancel = {
+                    settingsViewModel.onEvent(OnClickCancelEvent)
+                    viewModel.onEvent(OnConfirmSettingsAlertClosedEvent(false))
+                })
         } else {
             NavigationScreen(viewModel = viewModel,
                 settingsViewModel = settingsViewModel,
@@ -92,7 +107,7 @@ private fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: Setting
                 onUndo = { viewModel.onEvent(OnClickUndoEvent) },
                 onShowSettings = { viewModel.onEvent(OnClickSettingsEvent) },
                 onResetScore = { viewModel.onEvent(OnClickResetEvent) },
-                onSettingsShown = { viewModel.onEvent(OnSettingsShownEvent) })
+                onSettingScreenClosed = { viewModel.onEvent(OnSettingsScreenClosedEvent) })
         }
     }
 }
@@ -107,16 +122,14 @@ private fun NavigationScreen(
     onIncrementPlayer2: () -> Unit,
     onUndo: () -> Unit,
     onShowSettings: () -> Unit,
-    onResetScore: () -> Unit,
-    onSettingsShown: () -> Unit
-) {
+    onSettingScreenClosed: () -> Unit,
+    onResetScore: () -> Unit) {
     val state by viewModel.mainScreenState.collectAsState()
     val navigationEventState by viewModel.navigationEvent.collectAsState()
     val navController = rememberSwipeDismissableNavController()
 
     if (navigationEventState != null && navigationEventState is OnClickSettingsEvent) {
-        navController.navigate("second_screen_test")
-        onSettingsShown()
+        navController.navigate("settings_screen")
     }
 
     AppScaffold(timeText = {
@@ -125,7 +138,7 @@ private fun NavigationScreen(
 
         SwipeDismissableNavHost(
             navController = navController,
-            startDestination = "tennis_match_screen"
+            startDestination = "tennis_match_screen", userSwipeEnabled = false
         ) {
             composable("tennis_match_screen") {
                 TennisMatchScreen(
@@ -139,8 +152,11 @@ private fun NavigationScreen(
                     onShowSettings
                 )
             }
-            composable("second_screen_test") {
-                SettingsScreen(settingsViewModel = settingsViewModel)
+            composable("settings_screen") {
+                SettingsScreen(settingsViewModel = settingsViewModel, onSettingsEditEnd = {
+                    navController.popBackStack()
+                    onSettingScreenClosed()
+                })
             }
         }
     }

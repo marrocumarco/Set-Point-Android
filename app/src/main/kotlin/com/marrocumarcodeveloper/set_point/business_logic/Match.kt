@@ -9,6 +9,7 @@ interface Match {
 
     suspend fun undo()
 
+    val shouldRestartMatch: Boolean
     val canUndo: Boolean
     val player1PointsDescription: String
     val player2PointsDescription: String
