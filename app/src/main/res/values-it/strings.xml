@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Set-Point</string>
+    <string name="confirm_match_reset">Vuoi ricominciare l\'incontro?</string>
+    <string name="confirm_settings">Confermi le impostazioni?\nIl punteggio verrà azzerato.</string>
+    <string name="player1">G1</string>
+    <string name="player2">G2</string>
+    <string name="ended_match">Gioco, partita, incontro</string>
+    <string name="games">giochi</string>
+    <string name="sets">partite</string>
+    <string name="settings_title">Impostazioni</string>
+    <string name="confirm_tile">Conferma</string>
+    <string name="yes">Si</string>
+</resources>

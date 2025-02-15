@@ -23,6 +23,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchUseCase) : ViewModel() {
+    val cancelCaption: String
+        get() = matchUseCase.cancelCaption
+    val confirmCaption: String
+        get() = matchUseCase.confirmCaption
+    val player2Name: String
+        get() = matchUseCase.player2Name
+    val player1Name: String
+        get() = matchUseCase.player1Name
+    val gamesCaption: String
+        get() = matchUseCase.gamesCaption
+    val setsCaption: String
+        get() = matchUseCase.setsCaption
     // State is maintained using StateFlow
     private val _mainScreenState = MutableStateFlow(MainScreenState.initValue)
     val mainScreenState: StateFlow<MainScreenState> = _mainScreenState.asStateFlow()

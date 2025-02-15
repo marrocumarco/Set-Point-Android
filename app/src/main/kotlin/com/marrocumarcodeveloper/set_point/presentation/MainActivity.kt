@@ -31,6 +31,7 @@ import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Button
@@ -45,6 +46,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
+import com.marrocumarcodeveloper.set_point.R
 import com.marrocumarcodeveloper.set_point.presentation.components.SettingsScreen
 import com.marrocumarcodeveloper.set_point.presentation.components.ConfirmationDialog
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickCancelEvent
@@ -85,12 +87,16 @@ private fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: Setting
     SetPointTheme {
         if (showConfirmationDialog) {
             ConfirmationDialog(
-                text = "Confirm match reset?",
+                text = stringResource(id = R.string.confirm_match_reset),
+                confirmCaption = viewModel.confirmCaption,
+                cancelCaption = viewModel.cancelCaption,
                 onConfirm = { viewModel.onEvent(OnClickConfirmResetEvent) },
                 onCancel = { viewModel.onEvent(OnClickCancelResetEvent) })
         } else if (showSettingsConfirmationDialog) {
             ConfirmationDialog(
-                text = "Confirm settings?\nThe match will be reset.",
+                text = stringResource(id = R.string.confirm_settings),
+                confirmCaption = viewModel.confirmCaption,
+                cancelCaption = viewModel.cancelCaption,
                 onConfirm = {
                     settingsViewModel.onEvent(OnClickConfirmEvent)
                     viewModel.onEvent(OnConfirmSettingsAlertClosedEvent(true))
@@ -102,6 +108,8 @@ private fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: Setting
         } else {
             NavigationScreen(viewModel = viewModel,
                 settingsViewModel = settingsViewModel,
+                player1Name = viewModel.player1Name,
+                player2Name = viewModel.player2Name,
                 onIncrementPlayer1 = { viewModel.onEvent(OnClickPLayerOneScoredEvent) },
                 onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) },
                 onUndo = { viewModel.onEvent(OnClickUndoEvent) },
@@ -116,8 +124,8 @@ private fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: Setting
 private fun NavigationScreen(
     viewModel: MainActivityViewModel,
     settingsViewModel: SettingsViewModel,
-    player1Name: String = "P1",
-    player2Name: String = "P2",
+    player1Name: String,
+    player2Name: String,
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
     onUndo: () -> Unit,
@@ -144,6 +152,8 @@ private fun NavigationScreen(
                 TennisMatchScreen(
                     player1Name,
                     player2Name,
+                    viewModel.gamesCaption,
+                    viewModel.setsCaption,
                     state,
                     onIncrementPlayer1,
                     onIncrementPlayer2,
@@ -166,6 +176,8 @@ private fun NavigationScreen(
 private fun TennisMatchScreen(
     player1Name: String,
     player2Name: String,
+    gamesCaption: String,
+    setsCaption: String,
     state: MainScreenState,
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
@@ -187,6 +199,8 @@ private fun TennisMatchScreen(
         MatchScoreBoard(
             player1Name,
             player2Name,
+            gamesCaption,
+            setsCaption,
             state,
             onIncrementPlayer1,
             onIncrementPlayer2,
@@ -202,6 +216,8 @@ private fun TennisMatchScreen(
 private fun MatchScoreBoard(
     player1Name: String,
     player2Name: String,
+    gameCaption: String,
+    setCaption: String,
     state: MainScreenState,
     onIncrementPlayer1: () -> Unit,
     onIncrementPlayer2: () -> Unit,
@@ -228,7 +244,7 @@ private fun MatchScoreBoard(
         ) {
             item {
                 SetsScoreColumn(
-                    player1Name = player1Name, player2Name = player2Name, state = state
+                    player1Name = player1Name, player2Name = player2Name, state = state, gamesCaption = gameCaption, setsCaption = setCaption
                 )
             }
             item {
@@ -395,17 +411,17 @@ private fun UndoButton(enabled: Boolean, onUndo: () -> Unit) {
 }
 
 @Composable
-private fun SetsScoreColumn(player1Name: String, player2Name: String, state: MainScreenState) {
+private fun SetsScoreColumn(player1Name: String, player2Name: String, state: MainScreenState, gamesCaption: String, setsCaption: String) {
     Column {
         ThreeLabelsRow(player1Name, "", player2Name)
         ThreeLabelsRow(
             state.player1NumberOfGames.toString(),
-            "games",
+            gamesCaption,
             state.player2NumberOfGames.toString()
         )
         ThreeLabelsRow(
             state.player1NumberOfSets.toString(),
-            "sets",
+            setsCaption,
             state.player2NumberOfSets.toString()
         )
     }

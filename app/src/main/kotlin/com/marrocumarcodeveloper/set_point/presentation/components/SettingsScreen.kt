@@ -27,7 +27,6 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmTileEvent
-import com.marrocumarcodeveloper.set_point.presentation.states.SettingsScreenState
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickNumberOfSetsSelectedEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickTiebreakEvent
 import com.marrocumarcodeveloper.set_point.presentation.view_models.SettingsViewModel
@@ -38,33 +37,6 @@ internal fun SettingsScreen(
     onSettingsEditEnd: () -> Unit
 ) {
     val state = settingsViewModel.settingsScreenState.collectAsState()
-    TileList(
-        state = state.value,
-        onclickNumberOfSetsChip = {
-            settingsViewModel.onEvent(
-                OnClickNumberOfSetsSelectedEvent
-            )
-        },
-        onclickTiebreakChip = {
-            settingsViewModel.onEvent(
-                OnClickTiebreakEvent
-            )
-        },
-        onclickConfirmChip = {
-            settingsViewModel.onEvent(
-                OnClickConfirmTileEvent
-            )
-            onSettingsEditEnd()
-        })
-}
-
-@Composable
-private fun TileList(
-    state: SettingsScreenState,
-    onclickTiebreakChip: () -> Unit,
-    onclickNumberOfSetsChip: () -> Unit,
-    onclickConfirmChip: () -> Unit
-) {
     val configuration = LocalConfiguration.current
     val isRound = configuration.isScreenRound
     val columnState = rememberColumnState(
@@ -81,48 +53,65 @@ private fun TileList(
     ) {
         item {
             Text(
-                text = "Settings",
+                text = settingsViewModel.settingsTitle,
                 modifier = Modifier.padding(bottom = 16.dp),
                 style = MaterialTheme.typography.title3
             )
         }
         item {
-            createCustomChip(onClick = onclickTiebreakChip) {
+            createCustomChip(onClick = {
+                settingsViewModel.onEvent(
+                    OnClickTiebreakEvent
+                )
+            }) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Tiebreak")
+                    Text(settingsViewModel.tiebreakText)
                     Switch(
-                        checked = state.tiebreakEnabled,
-                        onCheckedChange = { onclickTiebreakChip() })
+                        checked = state.value.tiebreakEnabled,
+                        onCheckedChange = {
+                            settingsViewModel.onEvent(
+                                OnClickTiebreakEvent
+                            )
+                        })
                 }
             }
         }
 
         item {
-            createCustomChip(onClick = onclickNumberOfSetsChip) {
+            createCustomChip(onClick = {
+                settingsViewModel.onEvent(
+                    OnClickNumberOfSetsSelectedEvent
+                )
+            }) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Sets")
+                    Text(settingsViewModel.numberOfSetsText)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = state.selectedNumberOfSets.toString())
+                    Text(text = state.value.selectedNumberOfSets.toString())
                 }
             }
         }
 
         item {
-            createCustomChip(onClick = onclickConfirmChip) {
+            createCustomChip(onClick = {
+                settingsViewModel.onEvent(
+                    OnClickConfirmTileEvent
+                )
+                onSettingsEditEnd()
+            }) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Confirm")
+                    Text(settingsViewModel.confirmTileText)
                 }
             }
         }

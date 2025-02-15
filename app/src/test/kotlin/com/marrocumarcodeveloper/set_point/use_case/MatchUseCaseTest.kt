@@ -11,12 +11,14 @@ import org.mockito.Mockito.*
 class MatchUseCaseTest {
 
     private lateinit var match: Match
+    private lateinit var localizationRepository: LocalizationRepository
     private lateinit var matchUseCase: MatchUseCase
 
     @BeforeEach
     fun setUp() {
         match = mock(Match::class.java)
-        matchUseCase = MatchUseCase(match)
+        localizationRepository = mock(LocalizationRepository::class.java)
+        matchUseCase = MatchUseCase(match, localizationRepository)
     }
 
     @Test

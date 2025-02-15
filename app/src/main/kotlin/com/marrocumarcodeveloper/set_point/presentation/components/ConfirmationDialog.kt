@@ -20,7 +20,7 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.dialog.Confirmation
 
 @Composable
-internal fun ConfirmationDialog(text: String, onConfirm: () -> Unit, onCancel: () -> Unit) {
+internal fun ConfirmationDialog(text: String, confirmCaption: String, cancelCaption: String, onConfirm: () -> Unit, onCancel: () -> Unit) {
     Confirmation(
         onTimeout = { onCancel() },
         icon = {
@@ -45,10 +45,10 @@ internal fun ConfirmationDialog(text: String, onConfirm: () -> Unit, onCancel: (
                     .padding(top = 16.dp)
             ) {
                 Button(onClick = { onConfirm() }) {
-                    Text("Yes")
+                    Text(confirmCaption)
                 }
                 Button(onClick = { onCancel() }) {
-                    Text("No")
+                    Text(cancelCaption)
                 }
             }
         }

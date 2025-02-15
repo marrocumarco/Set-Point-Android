@@ -4,7 +4,19 @@ import com.marrocumarcodeveloper.set_point.business_logic.EndedSet
 import com.marrocumarcodeveloper.set_point.business_logic.Match
 import java.util.ArrayList
 
-internal class MatchUseCase(private val match: Match) {
+internal class MatchUseCase(private val match: Match, private val localizationRepository: LocalizationRepository) {
+    val confirmCaption: String
+        get() = localizationRepository.getConfirmCaption()
+    val cancelCaption: String
+        get() = localizationRepository.getCancelCaption()
+    val gamesCaption: String
+        get() = localizationRepository.getGamesCaption()
+    val setsCaption: String
+        get() = localizationRepository.getSetsCaption()
+    val player1Name: String
+        get() = localizationRepository.getPlayer1Name()
+    val player2Name: String
+        get() = localizationRepository.getPlayer2Name()
     val showConfirmSettingsAlert: Boolean
         get() = match.shouldRestartMatch
     val canUndo: Boolean
@@ -34,7 +46,7 @@ internal class MatchUseCase(private val match: Match) {
     val player1Serves: Boolean
         get() = match.player1Serves
 
-    private fun getFormattedWinnerDescription(winnerName: String) = "Game, set, match " + winnerName
+    private fun getFormattedWinnerDescription(winnerName: String) = localizationRepository.getEndedMatchMessage() + " " + winnerName
 
     suspend fun pointWonByPlayerOne() {
         match.pointWonByPlayerOne()

@@ -19,6 +19,14 @@ import javax.inject.Inject
 internal class SettingsViewModel @Inject constructor(private var settingsUseCase: SettingsUseCase) :
     ViewModel() {
 
+    val confirmTileText: String
+        get() = settingsUseCase.confirmTileText
+    val numberOfSetsText: String
+        get() = settingsUseCase.numberOfSetsText
+    val tiebreakText: String
+        get() = settingsUseCase.tiebreakText
+    val settingsTitle: String
+        get() = settingsUseCase.settingsTitle
     private val _settingsScreenState = MutableStateFlow(
         SettingsScreenState(
             settingsUseCase.getTiebreakEnabled(),

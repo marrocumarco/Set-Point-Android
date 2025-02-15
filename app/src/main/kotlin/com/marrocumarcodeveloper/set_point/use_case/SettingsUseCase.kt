@@ -2,7 +2,16 @@ package com.marrocumarcodeveloper.set_point.use_case
 
 import com.marrocumarcodeveloper.set_point.business_logic.Settings
 
-internal class SettingsUseCase(private val settings: Settings, private val dataAccess: DataAccess) {
+internal class SettingsUseCase(private val settings: Settings, private val dataAccess: DataAccess, private val localizationRepository: LocalizationRepository) {
+
+    val settingsTitle: String
+        get() = localizationRepository.getSettingsTitle()
+    val tiebreakText: String
+        get() = localizationRepository.getTiebreakText()
+    val numberOfSetsText: String
+        get() = localizationRepository.getNumberOfSetsText()
+    val confirmTileText: String
+        get() = localizationRepository.getConfirmTileText()
 
     init {
         settings.setSelectedNumberOfSets(dataAccess.getSelectedNumberOfSets(settings.getDefaultNumberOfSets()), false)
