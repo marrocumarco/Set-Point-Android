@@ -66,6 +66,7 @@ class MatchUseCaseTest {
     @Test
     fun getWinnerDescription() {
         `when`(match.winnerDescription).thenReturn("P1")
+        `when`(localizationRepository.getEndedMatchMessage()).thenReturn("Game, set, match")
         assertEquals("Game, set, match P1", matchUseCase.winnerDescription)
     }
 

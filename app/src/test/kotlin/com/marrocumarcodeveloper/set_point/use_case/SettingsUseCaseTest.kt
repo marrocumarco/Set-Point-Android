@@ -12,12 +12,14 @@ class SettingsUseCaseTest {
     private lateinit var settings: Settings
     private lateinit var dataAccess: DataAccess
     private lateinit var settingsUseCase: SettingsUseCase
+    private lateinit var localizationRepository: LocalizationRepository
 
     @BeforeEach
     fun setUp() {
         settings = mock(Settings::class.java)
         dataAccess = mock(DataAccess::class.java)
-        settingsUseCase = SettingsUseCase(settings, dataAccess)
+        localizationRepository = mock(LocalizationRepository::class.java)
+        settingsUseCase = SettingsUseCase(settings, dataAccess, localizationRepository)
     }
 
     @Test
