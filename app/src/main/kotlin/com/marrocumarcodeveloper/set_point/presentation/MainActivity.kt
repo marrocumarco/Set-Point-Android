@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.CompactButton
@@ -31,6 +33,7 @@ import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.times
@@ -39,7 +42,6 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
-import androidx.wear.tooling.preview.devices.WearDevices
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.AppScaffold
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -60,8 +62,8 @@ import com.marrocumarcodeveloper.set_point.presentation.events.OnClickSettingsEv
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickUndoEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnConfirmSettingsAlertClosedEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnSettingsScreenClosedEvent
-import com.marrocumarcodeveloper.set_point.presentation.states.MainScreenState
 import com.marrocumarcodeveloper.set_point.presentation.theme.SetPointTheme
+import com.marrocumarcodeveloper.set_point.presentation.theme.wearColorPalette
 import com.marrocumarcodeveloper.set_point.presentation.view_models.MainActivityViewModel
 import com.marrocumarcodeveloper.set_point.presentation.view_models.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,7 +77,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WearApp(viewModel, settingsViewModel = settingsViewModel)
+            WearApp(viewModel, settingsViewModel)
         }
     }
 }
@@ -85,146 +87,114 @@ private fun WearApp(viewModel: MainActivityViewModel, settingsViewModel: Setting
     val showConfirmationDialog by viewModel.showConfirmationDialog.collectAsState()
     val showSettingsConfirmationDialog by settingsViewModel.showConfirmationDialog.collectAsState()
     SetPointTheme {
-        if (showConfirmationDialog) {
-            ConfirmationDialog(
-                text = stringResource(id = R.string.confirm_match_reset),
-                confirmCaption = viewModel.confirmCaption,
-                cancelCaption = viewModel.cancelCaption,
-                onConfirm = { viewModel.onEvent(OnClickConfirmResetEvent) },
-                onCancel = { viewModel.onEvent(OnClickCancelResetEvent) })
-        } else if (showSettingsConfirmationDialog) {
-            ConfirmationDialog(
-                text = stringResource(id = R.string.confirm_settings),
-                confirmCaption = viewModel.confirmCaption,
-                cancelCaption = viewModel.cancelCaption,
-                onConfirm = {
-                    settingsViewModel.onEvent(OnClickConfirmEvent)
-                    viewModel.onEvent(OnConfirmSettingsAlertClosedEvent(true))
-                },
-                onCancel = {
-                    settingsViewModel.onEvent(OnClickCancelEvent)
-                    viewModel.onEvent(OnConfirmSettingsAlertClosedEvent(false))
-                })
-        } else {
-            NavigationScreen(viewModel = viewModel,
-                settingsViewModel = settingsViewModel,
-                player1Name = viewModel.player1Name,
-                player2Name = viewModel.player2Name,
-                onIncrementPlayer1 = { viewModel.onEvent(OnClickPLayerOneScoredEvent) },
-                onIncrementPlayer2 = { viewModel.onEvent(OnClickPLayerTwoScoredEvent) },
-                onUndo = { viewModel.onEvent(OnClickUndoEvent) },
-                onShowSettings = { viewModel.onEvent(OnClickSettingsEvent) },
-                onResetScore = { viewModel.onEvent(OnClickResetEvent) },
-                onSettingScreenClosed = { viewModel.onEvent(OnSettingsScreenClosedEvent) })
+        when {
+            showConfirmationDialog -> {
+                ConfirmationDialog(
+                    text = stringResource(id = R.string.confirm_match_reset),
+                    confirmCaption = viewModel.confirmCaption,
+                    cancelCaption = viewModel.cancelCaption,
+                    onConfirm = { viewModel.onEvent(OnClickConfirmResetEvent) },
+                    onCancel = { viewModel.onEvent(OnClickCancelResetEvent) }
+                )
+            }
+            showSettingsConfirmationDialog -> {
+                ConfirmationDialog(
+                    text = stringResource(id = R.string.confirm_settings),
+                    confirmCaption = viewModel.confirmCaption,
+                    cancelCaption = viewModel.cancelCaption,
+                    onConfirm = {
+                        settingsViewModel.onEvent(OnClickConfirmEvent)
+                        viewModel.onEvent(OnConfirmSettingsAlertClosedEvent(true))
+                    },
+                    onCancel = {
+                        settingsViewModel.onEvent(OnClickCancelEvent)
+                        viewModel.onEvent(OnConfirmSettingsAlertClosedEvent(false))
+                    }
+                )
+            }
+            else -> {
+                NavigationScreen(viewModel, settingsViewModel)
+            }
         }
     }
 }
 
 @Composable
-private fun NavigationScreen(
-    viewModel: MainActivityViewModel,
-    settingsViewModel: SettingsViewModel,
-    player1Name: String,
-    player2Name: String,
-    onIncrementPlayer1: () -> Unit,
-    onIncrementPlayer2: () -> Unit,
-    onUndo: () -> Unit,
-    onShowSettings: () -> Unit,
-    onSettingScreenClosed: () -> Unit,
-    onResetScore: () -> Unit) {
-    val state by viewModel.mainScreenState.collectAsState()
+private fun NavigationScreen(viewModel: MainActivityViewModel, settingsViewModel: SettingsViewModel) {
     val navigationEventState by viewModel.navigationEvent.collectAsState()
     val navController = rememberSwipeDismissableNavController()
 
-    if (navigationEventState != null && navigationEventState is OnClickSettingsEvent) {
+    if (navigationEventState is OnClickSettingsEvent) {
         navController.navigate("settings_screen")
     }
 
-    AppScaffold(timeText = {
-        TimeText() // Show hour on top
-    }) {
-
+    AppScaffold(timeText = { TimeText() }) {
         SwipeDismissableNavHost(
             navController = navController,
-            startDestination = "tennis_match_screen", userSwipeEnabled = false
+            startDestination = "tennis_match_screen",
+            userSwipeEnabled = false
         ) {
             composable("tennis_match_screen") {
-                TennisMatchScreen(
-                    player1Name,
-                    player2Name,
-                    viewModel.gamesCaption,
-                    viewModel.setsCaption,
-                    state,
-                    onIncrementPlayer1,
-                    onIncrementPlayer2,
-                    onUndo,
-                    onResetScore,
-                    onShowSettings
-                )
+                TennisMatchScreen(viewModel)
             }
             composable("settings_screen") {
-                SettingsScreen(settingsViewModel = settingsViewModel, onSettingsEditEnd = {
-                    navController.popBackStack()
-                    onSettingScreenClosed()
-                })
+                SettingsScreen(
+                    settingsViewModel = settingsViewModel,
+                    onSettingsEditEnd = {
+                        navController.popBackStack()
+                        viewModel.onEvent(OnSettingsScreenClosedEvent)
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun TennisMatchScreen(
-    player1Name: String,
-    player2Name: String,
-    gamesCaption: String,
-    setsCaption: String,
-    state: MainScreenState,
-    onIncrementPlayer1: () -> Unit,
-    onIncrementPlayer2: () -> Unit,
-    onUndo: () -> Unit,
-    onResetScore: () -> Unit,
-    onShowSettings: () -> Unit,
-) {
+private fun TennisMatchScreen(viewModel: MainActivityViewModel) {
+    val state by viewModel.mainScreenState.collectAsState()
     if (state.showEndedMatchAlert) {
-        GameOverConfirmation(
-            state.winnerDescription,
-            player1Name,
-            player2Name,
-            state.player1FinalScoreDescription,
-            state.player2FinalScoreDescription,
-            onUndo,
-            onResetScore
-        )
+        GameOverConfirmation(viewModel)
     } else {
-        MatchScoreBoard(
-            player1Name,
-            player2Name,
-            gamesCaption,
-            setsCaption,
-            state,
-            onIncrementPlayer1,
-            onIncrementPlayer2,
-            onUndo,
-            onResetScore,
-            onShowSettings
-        )
+        MatchScoreBoard(viewModel)
     }
 }
 
 @Composable
+private fun GameOverConfirmation(viewModel: MainActivityViewModel) {
+    val state by viewModel.mainScreenState.collectAsState()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            text = state.winnerDescription,
+            textAlign = TextAlign.Center
+        )
+        Column {
+            PlayerScoreRow(viewModel.player1Name, state.player1FinalScoreDescription)
+            PlayerScoreRow(viewModel.player2Name, state.player2FinalScoreDescription)
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            UndoButton(true, { viewModel.onEvent(OnClickUndoEvent) })
+            ResetButton { viewModel.onEvent(OnClickResetEvent) }
+        }
+    }
+}
+
 @OptIn(ExperimentalHorologistApi::class)
-private fun MatchScoreBoard(
-    player1Name: String,
-    player2Name: String,
-    gameCaption: String,
-    setCaption: String,
-    state: MainScreenState,
-    onIncrementPlayer1: () -> Unit,
-    onIncrementPlayer2: () -> Unit,
-    onUndo: () -> Unit,
-    onResetScore: () -> Unit,
-    onShowSettings: () -> Unit
-) {
+@Composable
+private fun MatchScoreBoard(viewModel: MainActivityViewModel) {
     val configuration = LocalConfiguration.current
     val isRound = configuration.isScreenRound
     val columnState = rememberColumnState(
@@ -243,83 +213,21 @@ private fun MatchScoreBoard(
             columnState = columnState
         ) {
             item {
-                SetsScoreColumn(
-                    player1Name = player1Name, player2Name = player2Name, state = state, gamesCaption = gameCaption, setsCaption = setCaption
-                )
+                SetsScoreColumn(viewModel)
             }
             item {
-                GameScoreRow(state, onIncrementPlayer1, onIncrementPlayer2, onUndo)
+                GameScoreRow(viewModel)
             }
             item {
-                ResetAndSettingsRow(onShowSettings, onResetScore)
+                ResetAndSettingsRow(viewModel)
             }
         }
     }
 }
 
 @Composable
-private fun GameOverConfirmation(
-    winnerDescription: String,
-    player1Name: String,
-    player2Name: String,
-    player1Score: String,
-    player2Score: String,
-    onUndoTap: () -> Unit,
-    onResetTap: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
-    ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            text = winnerDescription,
-            textAlign = TextAlign.Center
-        )
-        Column {
-            PlayerScoreRow(player1Name, player1Score)
-            PlayerScoreRow(player2Name, player2Score)
-        }
-
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.Bottom) {
-            UndoButton(true, onUndoTap)
-            ResetButton(onResetTap)
-        }
-    }
-}
-
-@Composable
-private fun PlayerScoreRow(winnerDescription: String, winnerScore: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = winnerDescription,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = winnerScore,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
-private fun GameScoreRow(
-    state: MainScreenState,
-    onIncrementPlayer1: () -> Unit,
-    onIncrementPlayer2: () -> Unit,
-    onUndo: () -> Unit
-) {
+private fun GameScoreRow(viewModel: MainActivityViewModel) {
+    val state by viewModel.mainScreenState.collectAsState()
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth()
@@ -333,7 +241,7 @@ private fun GameScoreRow(
             PlayerScoreButton(
                 state.player1PointsDescription, enabled = state.pointButtonsEnabled
             ) {
-                onIncrementPlayer1()
+                viewModel.onEvent(OnClickPLayerOneScoredEvent)
             }
         }
         Spacer(modifier = Modifier.size(8.dp)) // Add space between buttons
@@ -343,7 +251,7 @@ private fun GameScoreRow(
                 .aspectRatio(1f),
             contentAlignment = Alignment.Center
         ) {
-            UndoButton(state.undoButtonEnabled, onUndo)
+            UndoButton(state.undoButtonEnabled, { viewModel.onEvent(OnClickUndoEvent) })
         }
         Spacer(modifier = Modifier.size(8.dp)) // Add space between button
         Box(
@@ -355,20 +263,99 @@ private fun GameScoreRow(
             PlayerScoreButton(
                 state.player2PointsDescription, enabled = state.pointButtonsEnabled
             ) {
-                onIncrementPlayer2()
+                viewModel.onEvent(OnClickPLayerTwoScoredEvent)
             }
         }
     }
 }
 
 @Composable
-private fun ResetAndSettingsRow(
-    onShowSettings: () -> Unit,
-    onResetScore: () -> Unit
-) {
+private fun ResetAndSettingsRow(viewModel: MainActivityViewModel) {
     Row {
-        SettingsButton(onShowSettings)
-        ResetButton(onResetScore)
+        SettingsButton { viewModel.onEvent(OnClickSettingsEvent) }
+        ResetButton { viewModel.onEvent(OnClickResetEvent) }
+    }
+}
+
+@Composable
+private fun SetsScoreColumn(viewModel: MainActivityViewModel) {
+    val state by viewModel.mainScreenState.collectAsState()
+    Column {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = viewModel.player1Name)
+                Spacer(modifier = Modifier.size(3.dp))
+                ServeIcon(isVisible = state.player1Serves)
+            }
+            Spacer(modifier = Modifier.size(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ServeIcon(isVisible = !state.player1Serves)
+                Spacer(modifier = Modifier.size(3.dp))
+                Text(text = viewModel.player2Name)
+            }
+        }
+        ThreeLabelsRow(
+            state.player1NumberOfGames.toString(),
+            viewModel.gamesCaption,
+            state.player2NumberOfGames.toString()
+        )
+        ThreeLabelsRow(
+            state.player1NumberOfSets.toString(),
+            viewModel.setsCaption,
+            state.player2NumberOfSets.toString()
+        )
+    }
+}
+
+@Composable
+private fun ServeIcon(isVisible: Boolean) {
+AnimatedVisibility(
+    visible = isVisible,
+    enter = fadeIn(),
+    exit = fadeOut()) {
+    Icon(
+        painter = painterResource(id = R.drawable.tennis_ball),
+        contentDescription = "",
+        modifier = Modifier.size(10.dp),
+        tint = wearColorPalette.primary
+    )
+}
+
+}
+
+@Composable
+private fun ThreeLabelsRow(firstText: String, secondText: String, thirdText: String) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(text = firstText)
+        Text(text = secondText)
+        Text(text = thirdText)
+    }
+}
+
+@Composable
+fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
+    Button(
+        onClick = { onIncrement() },
+        enabled = enabled,
+        colors = androidx.wear.compose.material.ButtonDefaults.primaryButtonColors()
+    ) {
+        Text(
+            text = playerScore, style = MaterialTheme.typography.bodySmall, fontSize = 17.sp,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -411,50 +398,20 @@ private fun UndoButton(enabled: Boolean, onUndo: () -> Unit) {
 }
 
 @Composable
-private fun SetsScoreColumn(player1Name: String, player2Name: String, state: MainScreenState, gamesCaption: String, setsCaption: String) {
-    Column {
-        ThreeLabelsRow(player1Name, "", player2Name)
-        ThreeLabelsRow(
-            state.player1NumberOfGames.toString(),
-            gamesCaption,
-            state.player2NumberOfGames.toString()
-        )
-        ThreeLabelsRow(
-            state.player1NumberOfSets.toString(),
-            setsCaption,
-            state.player2NumberOfSets.toString()
-        )
-    }
-}
-
-@Composable
-private fun ThreeLabelsRow(firstText: String, secondText: String, thirdText: String) {
+private fun PlayerScoreRow(winnerDescription: String, winnerScore: String) {
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(text = firstText)
-        Text(text = secondText)
-        Text(text = thirdText)
-    }
-}
-
-@Composable
-fun PlayerScoreButton(playerScore: String, enabled: Boolean, onIncrement: () -> Unit) {
-    Button(
-        onClick = { onIncrement() },
-        enabled = enabled,
-        colors = androidx.wear.compose.material.ButtonDefaults.primaryButtonColors()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = playerScore, style = MaterialTheme.typography.bodySmall, fontSize = 17.sp,
+            text = winnerDescription,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = winnerScore,
             textAlign = TextAlign.Center
         )
     }
-}
-
-@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
-@Composable
-fun DefaultPreview() {
-    GameOverConfirmation("P1", "P1", "P2", "1 2 3 4 5", "1 2 3 4 5", {}, {})
 }
