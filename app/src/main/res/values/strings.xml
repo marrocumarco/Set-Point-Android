@@ -8,8 +8,8 @@
     <string name="games">games</string>
     <string name="sets">sets</string>
     <string name="settings_title">Settings</string>
-    <string name="tiebreak">Tiebreak</string>
+    <string name="tiebreak" translatable="false">Tiebreak</string>
     <string name="confirm_tile">Confirm</string>
     <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="no" translatable="false">No</string>
 </resources>
