@@ -33,10 +33,13 @@ android {
         applicationId = "com.marrocumarcodeveloper.set_point"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
+        versionCode = 5
         versionName = "1.1.0"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        ndk {
+            debugSymbolLevel = "FULL"
         }
     }
 
@@ -47,6 +50,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
     compileOptions {
