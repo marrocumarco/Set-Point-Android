@@ -27,6 +27,7 @@ import androidx.wear.compose.material.Switch
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
+import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickConfirmTileEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickNumberOfSetsSelectedEvent
@@ -44,76 +45,78 @@ internal fun SettingsScreen(
     val columnState = rememberColumnState(
         factory = ScalingLazyColumnDefaults.responsive()
     )
-    ScalingLazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                horizontal = if (isRound) 0.1f * configuration.screenWidthDp.dp else 0.dp,
-                vertical = 0.dp
-            ),
-        columnState = columnState
-    ) {
-        item {
-            Text(
-                text = settingsViewModel.settingsTitle,
-                modifier = Modifier.padding(bottom = 16.dp),
-                style = MaterialTheme.typography.title3
-            )
-        }
-        item {
-            CreateCustomChip(onClick = {
-                settingsViewModel.onEvent(
-                    OnClickTiebreakEvent
+    ScreenScaffold(scrollState = columnState) {
+        ScalingLazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    horizontal = if (isRound) 0.1f * configuration.screenWidthDp.dp else 0.dp,
+                    vertical = 0.dp
+                ),
+            columnState = columnState
+        ) {
+            item {
+                Text(
+                    text = settingsViewModel.settingsTitle,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    style = MaterialTheme.typography.title3
                 )
-            }) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(settingsViewModel.tiebreakText)
-                    Switch(
-                        checked = state.value.tiebreakEnabled,
-                        onCheckedChange = {
-                            settingsViewModel.onEvent(
-                                OnClickTiebreakEvent
-                            )
-                        })
+            }
+            item {
+                CreateCustomChip(onClick = {
+                    settingsViewModel.onEvent(
+                        OnClickTiebreakEvent
+                    )
+                }) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(settingsViewModel.tiebreakText)
+                        Switch(
+                            checked = state.value.tiebreakEnabled,
+                            onCheckedChange = {
+                                settingsViewModel.onEvent(
+                                    OnClickTiebreakEvent
+                                )
+                            })
+                    }
                 }
             }
-        }
 
-        item {
-            CreateCustomChip(onClick = {
-                settingsViewModel.onEvent(
-                    OnClickNumberOfSetsSelectedEvent
-                )
-            }) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(settingsViewModel.numberOfSetsText.capitalize(locale = Locale.current))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = state.value.selectedNumberOfSets.toString())
+            item {
+                CreateCustomChip(onClick = {
+                    settingsViewModel.onEvent(
+                        OnClickNumberOfSetsSelectedEvent
+                    )
+                }) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(settingsViewModel.numberOfSetsText.capitalize(locale = Locale.current))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = state.value.selectedNumberOfSets.toString())
+                    }
                 }
             }
-        }
 
-        item {
-            CreateCustomChip(onClick = {
-                settingsViewModel.onEvent(
-                    OnClickConfirmTileEvent
-                )
-                onSettingsEditEnd()
-            }) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(settingsViewModel.confirmTileText)
+            item {
+                CreateCustomChip(onClick = {
+                    settingsViewModel.onEvent(
+                        OnClickConfirmTileEvent
+                    )
+                    onSettingsEditEnd()
+                }) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(settingsViewModel.confirmTileText)
+                    }
                 }
             }
         }
