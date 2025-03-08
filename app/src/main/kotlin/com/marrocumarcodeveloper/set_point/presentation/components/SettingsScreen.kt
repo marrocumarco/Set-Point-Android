@@ -15,6 +15,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Text
@@ -59,7 +61,7 @@ internal fun SettingsScreen(
             )
         }
         item {
-            createCustomChip(onClick = {
+            CreateCustomChip(onClick = {
                 settingsViewModel.onEvent(
                     OnClickTiebreakEvent
                 )
@@ -82,7 +84,7 @@ internal fun SettingsScreen(
         }
 
         item {
-            createCustomChip(onClick = {
+            CreateCustomChip(onClick = {
                 settingsViewModel.onEvent(
                     OnClickNumberOfSetsSelectedEvent
                 )
@@ -92,7 +94,7 @@ internal fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(settingsViewModel.numberOfSetsText)
+                    Text(settingsViewModel.numberOfSetsText.capitalize(locale = Locale.current))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(text = state.value.selectedNumberOfSets.toString())
                 }
@@ -100,7 +102,7 @@ internal fun SettingsScreen(
         }
 
         item {
-            createCustomChip(onClick = {
+            CreateCustomChip(onClick = {
                 settingsViewModel.onEvent(
                     OnClickConfirmTileEvent
                 )
@@ -119,7 +121,7 @@ internal fun SettingsScreen(
 }
 
 @Composable
-private fun createCustomChip(onClick: () -> Unit, content: @Composable() (RowScope.() -> Unit)) {
+private fun CreateCustomChip(onClick: () -> Unit, content: @Composable() (RowScope.() -> Unit)) {
     Chip(
         label = { content() },
         onClick = { onClick() },
