@@ -15,40 +15,51 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.dialog.Confirmation
+import com.google.android.horologist.compose.layout.ScreenScaffold
 
 @Composable
-internal fun ConfirmationDialog(text: String, confirmCaption: String, cancelCaption: String, onConfirm: () -> Unit, onCancel: () -> Unit) {
-    Confirmation(
-        onTimeout = { onCancel() },
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.RestartAlt,
-                contentDescription = "Reset Match",
-                modifier = Modifier.size(48.dp)
-            )
-        },
-        durationMillis = 5000L
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = text,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
-                Button(onClick = { onConfirm() }) {
-                    Text(confirmCaption)
-                }
-                Button(onClick = { onCancel() }) {
-                    Text(cancelCaption)
+internal fun ConfirmationDialog(
+    text: String,
+    confirmCaption: String,
+    cancelCaption: String,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    val scrollState = rememberScalingLazyListState()
+    ScreenScaffold(scrollState = scrollState) {
+        Confirmation(
+            onTimeout = { onCancel() },
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.RestartAlt,
+                    contentDescription = "Reset Match",
+                    modifier = Modifier.size(48.dp)
+                )
+            },
+            scrollState = scrollState
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = text,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    Button(onClick = { onConfirm() }) {
+                        Text(confirmCaption)
+                    }
+                    Button(onClick = { onCancel() }) {
+                        Text(cancelCaption)
+                    }
                 }
             }
         }

@@ -198,11 +198,9 @@ private fun MatchScoreBoard(viewModel: MainActivityViewModel) {
     val configuration = LocalConfiguration.current
     val isRound = configuration.isScreenRound
     val columnState = rememberColumnState(
-        factory = ScalingLazyColumnDefaults.responsive(
-            userScrollEnabled = false
-        )
+        factory = ScalingLazyColumnDefaults.responsive()
     )
-    ScreenScaffold {
+    ScreenScaffold(scrollState = columnState) {
         ScalingLazyColumn(
             modifier = Modifier
                 .fillMaxSize()

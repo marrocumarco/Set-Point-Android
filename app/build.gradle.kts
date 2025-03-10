@@ -33,7 +33,7 @@ android {
         applicationId = "com.marrocumarcodeveloper.set_point"
         minSdk = 26
         targetSdk = 34
-        versionCode = 5
+        versionCode = 6
         versionName = "1.1.0"
         vectorDrawables {
             useSupportLibrary = true
