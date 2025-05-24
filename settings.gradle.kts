@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Set-Point"
 include(":app")
+include(":shared")
