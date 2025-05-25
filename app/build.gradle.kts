@@ -14,7 +14,6 @@ val lifecycleRuntimeKtxVersion by extra("2.8.7")
 val activityComposeVersion by extra("1.9.3")
 val animationGraphicsVersion by extra("1.7.6")
 val wearToolingPreviewVersion by extra("1.0.0")
-val hiltAndroidVersion by extra("2.51.1")
 val mockitoCoreVersion by extra("5.5.0")
 val mockitoKotlinVersion by extra("5.1.0")
 
@@ -22,7 +21,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -99,9 +97,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("com.google.dagger:hilt-android:$hiltAndroidVersion")
     implementation("androidx.compose.animation:animation:$animationGraphicsVersion")
-    kapt("com.google.dagger:hilt-android-compiler:$hiltAndroidVersion")
     testImplementation(kotlin("test"))
     testImplementation("org.mockito:mockito-core:$mockitoCoreVersion")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")

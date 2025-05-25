@@ -1,7 +1,13 @@
 package com.marrocumarcodeveloper.set_point
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
 
-@HiltAndroidApp
-class SetPoint: Application()
+class SetPoint: Application() {
+    lateinit var container: AppContainer
+        private set
+
+    override fun onCreate() {
+        super.onCreate()
+        container = AppContainer(this)
+    }
+}

@@ -9,14 +9,11 @@ import com.marrocumarcodeveloper.set_point.presentation.events.OnClickTiebreakEv
 import com.marrocumarcodeveloper.set_point.presentation.states.SettingsScreenState
 import com.marrocumarcodeveloper.set_point.presentation.events.SettingsViewEvent
 import com.marrocumarcodeveloper.set_point.use_case.SettingsUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
 
-@HiltViewModel
-internal class SettingsViewModel @Inject constructor(private var settingsUseCase: SettingsUseCase) :
+internal class SettingsViewModel(private var settingsUseCase: SettingsUseCase) :
     ViewModel() {
 
     val confirmTileText: String
@@ -35,7 +32,7 @@ internal class SettingsViewModel @Inject constructor(private var settingsUseCase
         )
     )
 
-    val settingsScreenState: StateFlow<SettingsScreenState> = _settingsScreenState.asStateFlow()
+    internal val settingsScreenState: StateFlow<SettingsScreenState> = _settingsScreenState.asStateFlow()
     private val _showConfirmationDialog = MutableStateFlow(false)
     val showConfirmationDialog: StateFlow<Boolean> = _showConfirmationDialog.asStateFlow()
 
@@ -56,7 +53,7 @@ internal class SettingsViewModel @Inject constructor(private var settingsUseCase
         )
     }
 
-    fun onEvent(event: SettingsViewEvent) {
+    internal fun onEvent(event: SettingsViewEvent) {
         when (event) {
             is OnClickTiebreakEvent -> onTiebreakEnabledStateChanged()
             is OnClickNumberOfSetsSelectedEvent -> onClickNumberOfSetsSelected()

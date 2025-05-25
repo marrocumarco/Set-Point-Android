@@ -3,7 +3,6 @@ package com.marrocumarcodeveloper.set_point.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -49,6 +48,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
 import com.marrocumarcodeveloper.set_point.R
+import com.marrocumarcodeveloper.set_point.SetPoint
 import com.marrocumarcodeveloper.set_point.presentation.components.SettingsScreen
 import com.marrocumarcodeveloper.set_point.presentation.components.ConfirmationDialog
 import com.marrocumarcodeveloper.set_point.presentation.events.OnClickCancelEvent
@@ -66,16 +66,19 @@ import com.marrocumarcodeveloper.set_point.presentation.theme.SetPointTheme
 import com.marrocumarcodeveloper.set_point.presentation.theme.wearColorPalette
 import com.marrocumarcodeveloper.set_point.presentation.view_models.MainActivityViewModel
 import com.marrocumarcodeveloper.set_point.presentation.view_models.SettingsViewModel
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainActivityViewModel by viewModels()
-    private val settingsViewModel: SettingsViewModel by viewModels()
+    private lateinit var viewModel: MainActivityViewModel
+    private lateinit var settingsViewModel: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel = (application as SetPoint).container.mainActivityViewModelFactory.create()
+        settingsViewModel = (application as SetPoint).container.settingsViewModelFactory.create()
+
+        viewModel
         setContent {
             WearApp(viewModel, settingsViewModel)
         }

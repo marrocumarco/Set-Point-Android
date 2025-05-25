@@ -14,15 +14,12 @@ import com.marrocumarcodeveloper.set_point.presentation.events.OnClickUndoEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnConfirmSettingsAlertClosedEvent
 import com.marrocumarcodeveloper.set_point.presentation.events.OnSettingsScreenClosedEvent
 import com.marrocumarcodeveloper.set_point.use_case.MatchUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-internal class MainActivityViewModel @Inject constructor(private var matchUseCase: MatchUseCase) : ViewModel() {
+internal class MainActivityViewModel (private var matchUseCase: MatchUseCase) : ViewModel() {
     val cancelCaption: String
         get() = matchUseCase.cancelCaption
     val confirmCaption: String
