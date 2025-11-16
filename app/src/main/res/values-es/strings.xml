@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Set-Point</string>
+    <string name="confirm_match_reset">¿Confirmar el reinicio del partido?</string>
+    <string name="confirm_settings">¿Confirmar la configuración?\nEl partido se reiniciará.</string>
+    <string name="player1">J1</string>
+    <string name="player2">J2</string>
+    <string name="ended_match">Juego, set y partido</string>
+    <string name="games">juegos</string>
+    <string name="sets">sets</string>
+    <string name="settings_title">Configuración</string>
+    <string name="tiebreak" translatable="false">Tiebreak</string>
+    <string name="confirm_tile">Confirmar</string>
+    <string name="yes">Sí</string>
+    <string name="no" translatable="false">No</string>
+</resources>
